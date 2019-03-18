@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "12600412885",
+    "firebase_url": "https://quizcreator-8def1.firebaseio.com",
+    "project_id": "quizcreator-8def1",
+    "storage_bucket": "quizcreator-8def1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:12600412885:android:e20ce44e71e0c72d",
+        "android_client_info": {
+          "package_name": "com.example.quizcreator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "12600412885-su03qblh9qhff6gqp7aq94q0f6rhedts.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.quizcreator",
+            "certificate_hash": "ed0f3de254bccd4fc41b4882bc9562a49af16991"
+          }
+        },
+        {
+          "client_id": "12600412885-a5o1cpa66rum46pvs5pag53sgb3ou9uo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSGgVN9yWLJh1wMcZOPGnQUejVgKCwtms"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "12600412885-a5o1cpa66rum46pvs5pag53sgb3ou9uo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

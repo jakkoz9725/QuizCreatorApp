@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/constraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    xmlns:tools="http://schemas.android.com/tools">
+
+        <TextView
+            android:id="@+id/fragmentNumberT"
+            android:layout_width="wrap_content"
+            android:layout_height="39dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:ems="10"
+            android:inputType="none"
+            android:text="Pytanie nr: "
+            android:textAlignment="center"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.437"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <EditText
+            android:id="@+id/questionET"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:ems="10"
+            android:hint="Podaj nazwe pytania"
+            android:inputType="none"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.437"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fragmentNumberT"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <EditText
+            android:id="@+id/answer1ET"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:ems="10"
+            android:hint="Podaj odpowiedź 1"
+            android:inputType="none"
+            android:textAlignment="center"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.437"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/questionET"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <EditText
+            android:id="@+id/answer2ET"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:ems="10"
+            android:hint="Podaj odpowiedź 2"
+            android:inputType="none"
+            android:textAlignment="center"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.437"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/answer1ET"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <EditText
+            android:id="@+id/answer3ET"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:ems="10"
+            android:hint="Podaj odpowiedź 3"
+            android:inputType="none"
+            android:textAlignment="center"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.437"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/answer2ET"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <EditText
+            android:id="@+id/answer4ET"
+            android:layout_width="wrap_content"
+            android:layout_height="46dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:ems="10"
+            android:hint="Podaj odpowiedź 4"
+            android:inputType="none"
+            android:textAlignment="center"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.437"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/answer3ET"
+            app:layout_constraintVertical_bias="0.005" />
+
+        <Button
+            android:id="@+id/deleteAnswerBtn"
+            android:layout_width="31dp"
+            android:layout_height="34dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="X"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/answer3ET"
+            app:layout_constraintEnd_toStartOf="@+id/answer3ET"
+            app:layout_constraintHorizontal_bias="0.684"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/addAnswerBtn"
+            android:layout_width="53dp"
+            android:layout_height="46dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="+"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/answer4ET"
+            app:layout_constraintEnd_toEndOf="@+id/answer3ET"
+            app:layout_constraintStart_toStartOf="@+id/answer3ET"
+            app:layout_constraintTop_toBottomOf="@+id/answer2ET" />
+
+        <Button
+            android:id="@+id/deleteTextBtn"
+            android:layout_width="36dp"
+            android:layout_height="37dp"
+            android:text="C"
+            android:visibility="gone"
+            tools:layout_editor_absoluteX="2dp"
+            tools:layout_editor_absoluteY="0dp" />
+
+        <Button
+            android:id="@+id/answerAcceptBtn"
+            android:layout_width="36dp"
+            android:layout_height="37dp"
+            android:text="A"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/editAnswer1Btn"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:text="E"
+            android:textSize="10sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/answer1ET"
+            app:layout_constraintStart_toEndOf="@+id/answer1ET"
+            app:layout_constraintTop_toTopOf="@+id/answer1ET" />
+
+        <Button
+            android:id="@+id/editAnswer2Btn"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:text="E"
+            android:textSize="10sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/answer2ET"
+            app:layout_constraintStart_toEndOf="@+id/answer2ET"
+            app:layout_constraintTop_toTopOf="@+id/answer2ET" />
+
+        <Button
+            android:id="@+id/editAnswer3Btn"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:text="E"
+            android:textSize="10sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/answer3ET"
+            app:layout_constraintStart_toEndOf="@+id/answer3ET"
+            app:layout_constraintTop_toTopOf="@+id/answer3ET" />
+
+        <Button
+            android:id="@+id/editAnswer4Btn"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:text="E"
+            android:textSize="10sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/answer4ET"
+            app:layout_constraintStart_toEndOf="@+id/answer4ET"
+            app:layout_constraintTop_toTopOf="@+id/answer4ET" />
+
+        <Button
+            android:id="@+id/editQuestionBtn"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:text="E"
+            android:textSize="10sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/questionET"
+            app:layout_constraintStart_toEndOf="@+id/questionET"
+            app:layout_constraintTop_toTopOf="@+id/questionET" />
+
+        <RadioButton
+            android:id="@+id/radioButton1"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/answer1ET"
+            app:layout_constraintEnd_toEndOf="@+id/answer1ET"
+            app:layout_constraintStart_toStartOf="@+id/answer1ET"
+            app:layout_constraintTop_toTopOf="@+id/answer1ET" />
+
+        <RadioButton
+            android:id="@+id/radioButton2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/answer2ET"
+            app:layout_constraintEnd_toEndOf="@+id/answer2ET"
+            app:layout_constraintStart_toStartOf="@+id/answer2ET"
+            app:layout_constraintTop_toTopOf="@+id/answer2ET" />
+
+        <RadioButton
+            android:id="@+id/radioButton3"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/answer3ET"
+            app:layout_constraintEnd_toEndOf="@+id/answer3ET"
+            app:layout_constraintStart_toStartOf="@+id/answer3ET"
+            app:layout_constraintTop_toTopOf="@+id/answer3ET" />
+
+        <RadioButton
+            android:id="@+id/radioButton4"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/answer4ET"
+            app:layout_constraintEnd_toEndOf="@+id/answer4ET"
+            app:layout_constraintStart_toStartOf="@+id/answer4ET"
+            app:layout_constraintTop_toTopOf="@+id/answer4ET" />
+
+        <Button
+            android:id="@+id/pickCorrectAnswerBtn"
+            android:layout_width="170dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Wybierz poprawna odpowiedz"
+            android:textSize="12sp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/radioButton4"
+            app:layout_constraintVertical_bias="0.113" />
+</android.support.constraint.ConstraintLayout>
