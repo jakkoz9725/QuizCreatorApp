@@ -8,8 +8,9 @@ public class Question { //Question class with all constructors and getters/sette
     private String answer2;
     private String answer3;
     private String answer4;
+    private String userAnswer;
 
-    private Question() {
+    public Question() {
     }
 
 
@@ -39,7 +40,7 @@ public class Question { //Question class with all constructors and getters/sette
         return correctAnswer;
     }
 
-    private void setCorrectAnswer(int correctAnswer) {
+    public void setCorrectAnswer(int correctAnswer) {
         this.correctAnswer = correctAnswer;
     }
 
@@ -47,7 +48,7 @@ public class Question { //Question class with all constructors and getters/sette
         return question;
     }
 
-    private void setQuestion(String question) {
+    public void setQuestion(String question) {
         this.question = question;
     }
 
@@ -55,7 +56,7 @@ public class Question { //Question class with all constructors and getters/sette
         return answer1;
     }
 
-    private void setAnswer1(String answer1) {
+    public void setAnswer1(String answer1) {
         this.answer1 = answer1;
     }
 
@@ -63,7 +64,7 @@ public class Question { //Question class with all constructors and getters/sette
         return answer2;
     }
 
-    private void setAnswer2(String answer2) {
+    public void setAnswer2(String answer2) {
         this.answer2 = answer2;
     }
 
@@ -71,7 +72,7 @@ public class Question { //Question class with all constructors and getters/sette
         return answer3;
     }
 
-    private void setAnswer3(String answer3) {
+    public void setAnswer3(String answer3) {
         this.answer3 = answer3;
     }
 
@@ -79,7 +80,15 @@ public class Question { //Question class with all constructors and getters/sette
         return answer4;
     }
 
-    private void setAnswer4(String answer4) {
+    public void setAnswer4(String answer4) {
         this.answer4 = answer4;
+    }
+
+    public String getUserAnswer() {
+        return userAnswer;
+    }
+
+    public void setUserAnswer(String userAnswer) {
+        this.userAnswer = userAnswer;
     }
 }

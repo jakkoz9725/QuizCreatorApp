@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.quizcreator.Classes.Quiz;
 import com.example.quizcreator.QuizArrayListAdapter;
@@ -23,12 +24,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnItemClick;
 
 public class MenuActivity extends Activity {
 
@@ -51,6 +55,9 @@ public class MenuActivity extends Activity {
         databaseReference = mFirebaseDatabase.getReference("Quizzes");
     }
 
+    @BindView(R.id.searchListET)
+    EditText searchListET;
+
     @BindView(R.id.menuConstraintLayout)
     ConstraintLayout menuConstraintLayout;
 
@@ -65,7 +72,7 @@ public class MenuActivity extends Activity {
 
     @OnClick(R.id.listOfQuizesBT)
     public void showAllQuizes() {
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 quizList.clear();
@@ -89,6 +96,59 @@ public class MenuActivity extends Activity {
         menuConstraintLayout.setVisibility(View.GONE);
     }
 
+    @OnItemClick(R.id.listOfQuizesLV)
+    public void onItemListClick(int i) {
+        Quiz quiz = quizList.get(i);
+        dialog = new Dialog(this);
+        dialog.setContentView(R.layout.checkquiz_dialogue);
+        TextView quizName = dialog.findViewById(R.id.quizNameT);
+        TextView creatorName = dialog.findViewById(R.id.creatorNameT);
+
+        quizName.setText("Quiz name : " + quiz.getQuizName());
+        creatorName.setText("Creator name : " + quiz.getCreatorUsername());
+
+        Button startQuizBT = dialog.findViewById(R.id.startQuizBT);
+        Button closeDialogueBT = dialog.findViewById(R.id.closeDialogueBT);
+
+        startQuizBT.setOnClickListener(v -> {
+            Intent intent = new Intent(this, QuizReadingActivity.class);
+            intent.putExtra("quizName", quiz.getQuizName());
+            intent.putExtra("creatorName", quiz.getCreatorUsername());
+            startActivity(intent);
+        });
+        closeDialogueBT.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+    dialog.show();
+    }
+
+    @OnClick(R.id.searchListBT)
+    public void searchQuizzes() {
+        String informationToSearch = searchListET.getText().toString();
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                quizList.clear();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    if (ds.getValue(Quiz.class).getQuizName().toLowerCase().contains(informationToSearch.toLowerCase()) ||
+                            ds.getValue(Quiz.class).getCreatorUsername().toLowerCase().contains(informationToSearch.toLowerCase())) {
+                        Quiz quiz = new Quiz();
+                        quiz.setCreatorUsername(ds.getValue(Quiz.class).getCreatorUsername());
+                        quiz.setQuizName(ds.getValue(Quiz.class).getQuizName());
+                        quizList.add(quiz);
+                    }
+                }
+                QuizArrayListAdapter adapter = new QuizArrayListAdapter(MenuActivity.this, quizList);
+                listOfQuizesLV.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
 
     @OnClick(R.id.createNewQuizBT)
     public void createNewQuiz() {
