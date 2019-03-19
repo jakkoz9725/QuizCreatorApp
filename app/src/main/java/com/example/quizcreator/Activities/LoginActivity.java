@@ -3,6 +3,7 @@ package com.example.quizcreator.Activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -10,7 +11,9 @@ import android.text.Layout;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,6 +32,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import butterknife.BindAnim;
+import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -71,6 +75,10 @@ public class LoginActivity extends Activity {
     @BindView(R.id.createAccCT)
     TextView createAccCT;
 
+    @BindDrawable(R.drawable.ghost_emoji)
+    Drawable ghostEmoji;
+    @BindView(R.id.imageViewEmoji)
+    ImageView imageViewEmoji;
 
     @BindView(R.id.loginInPB)
     ProgressBar loginInPB;
@@ -92,6 +100,8 @@ public class LoginActivity extends Activity {
     Animation transparent_anim_disapear;
     @BindAnim(R.anim.transparent_anim_appear)
     Animation transparent_anim_appear;
+    @BindAnim(R.anim.ghost_emoji)
+    Animation ghost_emoji;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -106,6 +116,9 @@ public class LoginActivity extends Activity {
         databaseReference = firebaseDatabase.getReference().child("Accounts");
         ButterKnife.bind(this);
         mAuth = FirebaseAuth.getInstance();
+        imageViewEmoji.setImageDrawable(ghostEmoji);
+        imageViewEmoji.startAnimation(ghost_emoji);
+
     }
 
     @OnClick(R.id.logoutCT)
