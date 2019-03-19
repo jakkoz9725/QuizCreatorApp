@@ -30,6 +30,7 @@ android {
 
 dependencies {
     implementation 'com.jakewharton:butterknife:9.0.0'
+    implementation 'uk.co.chrisjenx:calligraphy:2.2.0'
     implementation 'com.google.firebase:firebase-auth:16.1.0'
     implementation 'com.google.firebase:firebase-core:16.0.7'
     implementation 'com.google.firebase:firebase-database:16.0.1'

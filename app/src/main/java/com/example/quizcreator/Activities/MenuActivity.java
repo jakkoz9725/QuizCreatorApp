@@ -2,7 +2,11 @@ package com.example.quizcreator.Activities;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
@@ -35,6 +39,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MenuActivity extends Activity {
 
@@ -46,6 +51,11 @@ public class MenuActivity extends Activity {
     private DatabaseReference databaseReference;
 
     @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mainmenu_layout);
@@ -55,21 +65,22 @@ public class MenuActivity extends Activity {
         currentUserEmail = intent.getStringExtra("email");
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = mFirebaseDatabase.getReference("Quizzes");
-        startAnimation(flashAnimation,listOfQuizesBT);
 
 
     }
-    public void startAnimation(Animation animation,View v){
+
+
+    public void startAnimation(Animation animation, View v, View v2) {
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                v.setClickable(false);
-
+                v.setVisibility(View.GONE);
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                v.setClickable(true);
+                v2.setVisibility(View.VISIBLE);
+                v2.startAnimation(transparent_anim_appear);
             }
 
             @Override
@@ -77,7 +88,7 @@ public class MenuActivity extends Activity {
 
             }
         });
-        v.setAnimation(animation);
+        v.startAnimation(animation);
     }
 
     @BindView(R.id.searchListET)
@@ -87,7 +98,7 @@ public class MenuActivity extends Activity {
     ConstraintLayout menuConstraintLayout;
 
     @BindView(R.id.listOfQuizesConstraintLayout)
-    ConstraintLayout listOfQuizes;
+    ConstraintLayout listOfQuizesConstraintLayout;
 
     @BindView(R.id.listOfQuizesLV)
     ListView listOfQuizesLV;
@@ -99,13 +110,14 @@ public class MenuActivity extends Activity {
     Button createNewQuizBT;
 
     @OnClick(R.id.backToMenuBT)
-    public void onClickBackToMenuBT(){
-        listOfQuizes.setVisibility(View.GONE);
+    public void onClickBackToMenuBT() {
+        listOfQuizesConstraintLayout.setVisibility(View.GONE);
         menuConstraintLayout.setVisibility(View.VISIBLE);
     }
 
     @OnClick(R.id.listOfQuizesBT)
     public void showAllQuizes() {
+        startAnimation(transparent_anim_disapear, menuConstraintLayout, listOfQuizesConstraintLayout);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -125,9 +137,6 @@ public class MenuActivity extends Activity {
 
             }
         });
-
-        listOfQuizes.setVisibility(View.VISIBLE);
-        menuConstraintLayout.setVisibility(View.GONE);
     }
 
     @OnItemClick(R.id.listOfQuizesLV)
@@ -153,7 +162,7 @@ public class MenuActivity extends Activity {
         closeDialogueBT.setOnClickListener(v -> {
             dialog.dismiss();
         });
-    dialog.show();
+        dialog.show();
     }
 
     @OnClick(R.id.searchListBT)
@@ -184,18 +193,20 @@ public class MenuActivity extends Activity {
 
     }
 
+
     @OnClick(R.id.createNewQuizBT)
     public void createNewQuiz() {
         dialog = new Dialog(this);
         dialog.setContentView(R.layout.newquiz_dialogue);
+        ConstraintLayout constraintLayout = dialog.findViewById(R.id.dialogConstraintLayout);
         Button createNewQuiz = dialog.findViewById(R.id.createQuizBTdialogue);
         EditText quizNameET = dialog.findViewById(R.id.quizNameETdialogue);
-
         createNewQuiz.setOnClickListener(v -> {
             Intent intent = new Intent(this, QuizCreationActivity.class);
             intent.putExtra("quizName", quizNameET.getText().toString());
             startActivity(intent);
         });
+        constraintLayout.startAnimation(transparent_anim_appear);
         dialog.show();
     }
 
@@ -218,6 +229,12 @@ public class MenuActivity extends Activity {
 
     @BindAnim(R.anim.myanim)
     Animation testAnim;
+
+    @BindAnim(R.anim.transparent_anim_appear)
+    Animation transparent_anim_appear;
+
+    @BindAnim(R.anim.transparent_anim_disapear)
+    Animation transparent_anim_disapear;
 
     @BindAnim(R.anim.flash_anim)
     Animation flashAnimation;

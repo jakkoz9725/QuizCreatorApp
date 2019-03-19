@@ -1,6 +1,7 @@
 package com.example.quizcreator.Activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,6 +30,7 @@ import butterknife.BindAnim;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LoginActivity extends Activity {
     private FirebaseAuth mAuth;
@@ -78,12 +80,15 @@ public class LoginActivity extends Activity {
     EditText newUserPasswordRepET;
     @BindView(R.id.loginCT)
     TextView loginCT;
-    @BindAnim(R.anim.transparent_anim)
+    @BindAnim(R.anim.transparent_anim_appear)
     Animation transparent_anim;
     @BindAnim(R.anim.fromthesky_anim)
     Animation fromthesky_anim;
 
-
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,6 +150,14 @@ public class LoginActivity extends Activity {
                     }
                 });
     }
+    @OnClick(R.id.continueAsBT)
+    public void onContinueAsBTclick(){
+        Intent intent = new Intent(this,MenuActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("email",mAuth.getCurrentUser().getEmail());
+        startActivity(intent);
+        overridePendingTransition(R.anim.transparent_anim_appear,R.anim.transparent_anim_disapear);
+    }
     @Override
     protected void onStart() {
         super.onStart();
@@ -183,13 +196,6 @@ public class LoginActivity extends Activity {
 
         }
     }
-    public void test(){
-        Intent intent = new Intent(this,MenuActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-       // intent.putExtra("email",currentUser.getEmail());
-        startActivity(intent);
-    }
-
     public void startAnimation(Animation animation,View v){
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override

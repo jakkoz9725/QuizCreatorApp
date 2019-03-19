@@ -1,5 +1,6 @@
 package com.example.quizcreator.Activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
@@ -31,6 +32,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class QuizReadingActivity extends AppCompatActivity {
     String quizCreatorName;
@@ -42,6 +44,12 @@ public class QuizReadingActivity extends AppCompatActivity {
     private DatabaseReference databaseReferenceToQuiz;
     private ArrayList<Question> questionList = new ArrayList<>();
     private int questionNumber = 0;
+
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +64,7 @@ public class QuizReadingActivity extends AppCompatActivity {
         getQuiz();
 
     }
+
     public void getQuiz() {
         databaseReferenceToQuiz.addValueEventListener(new ValueEventListener() {
             @Override
@@ -77,13 +86,15 @@ public class QuizReadingActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), questionList.size() + "", Toast.LENGTH_SHORT).show();
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
     }
-    public void setQuestionToUI(int actualQuestion){
+
+    public void setQuestionToUI(int actualQuestion) {
         quizNameT.setText(quizName);
         quizQuestionT.setText(questionList.get(actualQuestion).getQuestion());
         quizAnswerOneBT.setText(questionList.get(actualQuestion).getAnswer1());
@@ -92,30 +103,32 @@ public class QuizReadingActivity extends AppCompatActivity {
         quizAnswerFourBT.setText(questionList.get(actualQuestion).getAnswer4());
         checkNumberOfAnswers();
     }
-    public void checkNumberOfAnswers(){
-        if(quizAnswerFourBT.getText().equals("")){
+
+    public void checkNumberOfAnswers() {
+        if (quizAnswerFourBT.getText().equals("")) {
             quizAnswerFourBT.setVisibility(View.GONE);
-        }else{
+        } else {
             quizAnswerFourBT.setVisibility(View.VISIBLE);
         }
-        if(quizAnswerThreeBT.getText().equals("")){
+        if (quizAnswerThreeBT.getText().equals("")) {
             quizAnswerThreeBT.setVisibility(View.GONE);
-        }else{
+        } else {
             quizAnswerThreeBT.setVisibility(View.VISIBLE);
         }
     }
-    public void checkCorrectAnswer(int buttonAnswer,Button button){
-        if(buttonAnswer == questionList.get(actualQuestion).getCorrectAnswer()){
+
+    public void checkCorrectAnswer(int buttonAnswer, Button button) {
+        if (buttonAnswer == questionList.get(actualQuestion).getCorrectAnswer()) {
             quizPoints++;
         }
         questionList.get(actualQuestion).setUserAnswer(button.getText().toString());
-        if((actualQuestion + 1) == questionList.size()){
+        if ((actualQuestion + 1) == questionList.size()) {
             CorrectAnswersListAdapter adapter = new CorrectAnswersListAdapter(QuizReadingActivity.this, questionList);
             listOfAnswers.setAdapter(adapter);
 
             questionsConstraintLayout.setVisibility(View.GONE);
             listConstraintLayout.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             actualQuestion++;
             setQuestionToUI(actualQuestion);
         }
@@ -123,22 +136,25 @@ public class QuizReadingActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.quizAnswerOneBT)
-    public void quizAnswerOneBTanswer(){
-        checkCorrectAnswer(1,quizAnswerOneBT);
+    public void quizAnswerOneBTanswer() {
+        checkCorrectAnswer(1, quizAnswerOneBT);
         Toast.makeText(this, actualQuestion + " actual question", Toast.LENGTH_SHORT).show();
 
     }
+
     @OnClick(R.id.quizAnswerTwoBT)
-    public void quizAnswerTwoBTanswer(){
-        checkCorrectAnswer(2,quizAnswerTwoBT);
+    public void quizAnswerTwoBTanswer() {
+        checkCorrectAnswer(2, quizAnswerTwoBT);
     }
+
     @OnClick(R.id.quizAnswerThreeBT)
-    public void quizAnswerThreeBTanswer(){
-        checkCorrectAnswer(3,quizAnswerThreeBT);
+    public void quizAnswerThreeBTanswer() {
+        checkCorrectAnswer(3, quizAnswerThreeBT);
     }
+
     @OnClick(R.id.quizAnswerFourBT)
-    public void quizAnswerFourBTanswer(){
-        checkCorrectAnswer(4,quizAnswerFourBT);
+    public void quizAnswerFourBTanswer() {
+        checkCorrectAnswer(4, quizAnswerFourBT);
     }
 
     @BindView(R.id.questionsConstraintLayout)

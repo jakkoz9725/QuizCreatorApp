@@ -1,5 +1,6 @@
 package com.example.quizcreator.Activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class QuizCreationActivity extends AppCompatActivity {
 
@@ -38,10 +40,14 @@ public class QuizCreationActivity extends AppCompatActivity {
     private DatabaseReference myRefAccounts;
     private DatabaseReference myRef;
     private String username;
-    private  Quiz quiz;
+    private Quiz quiz;
     public static int fragmentCounter = 0;
     boolean frag1, frag2, frag3, frag4, frag5;
 
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,13 +65,14 @@ public class QuizCreationActivity extends AppCompatActivity {
         myRefAccounts.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()){
-                    if(ds.getValue(User.class).getEmail().equals(mAuth.getCurrentUser().getEmail())){
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    if (ds.getValue(User.class).getEmail().equals(mAuth.getCurrentUser().getEmail())) {
                         username = ds.getValue(User.class).getUserName();
                         Toast.makeText(QuizCreationActivity.this, "Username: " + username, Toast.LENGTH_LONG).show();
                     }
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -101,9 +108,7 @@ public class QuizCreationActivity extends AppCompatActivity {
         }
 
 
-
-
-        quiz = new Quiz(quizName, FirebaseAuth.getInstance().getCurrentUser().getEmail(),username);
+        quiz = new Quiz(quizName, FirebaseAuth.getInstance().getCurrentUser().getEmail(), username);
         for (int n = 0; numberOfQuestions > n; n++) { // loop though all questions
 
             String a1 = mFragmentsArrayList.get(n).getAnswer1ET();  //Answer 1
