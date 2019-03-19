@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.view.View;
 import android.view.animation.Animation;
@@ -31,6 +32,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -193,21 +195,58 @@ public class MenuActivity extends Activity {
 
     }
 
-
     @OnClick(R.id.createNewQuizBT)
     public void createNewQuiz() {
         dialog = new Dialog(this);
         dialog.setContentView(R.layout.newquiz_dialogue);
+        Button createQuizBTdialogue = dialog.findViewById(R.id.createQuizBTdialogue);
+        TextView letterQ = dialog.findViewById(R.id.letterQ);
+        TextView letterU = dialog.findViewById(R.id.letterU);
+        TextView letterI = dialog.findViewById(R.id.letterI);
+        TextView letterZ = dialog.findViewById(R.id.letterZ);
+        EditText quizNameETdialogue = dialog.findViewById(R.id.quizNameETdialogue);
+
         ConstraintLayout constraintLayout = dialog.findViewById(R.id.dialogConstraintLayout);
-        Button createNewQuiz = dialog.findViewById(R.id.createQuizBTdialogue);
-        EditText quizNameET = dialog.findViewById(R.id.quizNameETdialogue);
-        createNewQuiz.setOnClickListener(v -> {
+        createQuizBTdialogue.setOnClickListener(v -> {
             Intent intent = new Intent(this, QuizCreationActivity.class);
-            intent.putExtra("quizName", quizNameET.getText().toString());
+            intent.putExtra("quizName", quizNameETdialogue.getText().toString());
             startActivity(intent);
         });
         constraintLayout.startAnimation(transparent_anim_appear);
+        constraintLayout.clearAnimation();
         dialog.show();
+        ArrayList<TextView> letters = new ArrayList<>();
+        letters.add(letterQ);
+        letters.add(letterU);
+        letters.add(letterI);
+        letters.add(letterZ);
+        lettersAnimation(transparent_anim_appear, letters, 0);
+    }
+
+    public void lettersAnimation(Animation animation, ArrayList<TextView> letters, int letterNr) {
+        if (letterNr != (letters.size())) {
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    letters.get(letterNr).setVisibility(View.VISIBLE);
+                    letters.get(letterNr).startAnimation(animation);
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    int newLetterNr = letterNr + 1;
+                    lettersAnimation(animation, letters, newLetterNr);
+                    letters.get(letterNr).clearAnimation();
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            letters.get(letterNr).startAnimation(animation);
+        }
     }
 
     @OnClick(R.id.settingsBT)

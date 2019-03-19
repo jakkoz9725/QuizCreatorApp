@@ -27,7 +27,7 @@
             android:layout_marginTop="36dp"
             android:layout_marginEnd="8dp"
             android:text="TextView"
-            android:textSize="24sp"
+            android:textSize="36sp"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
@@ -42,7 +42,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
             android:src="@drawable/welcome"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -55,7 +55,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:text="TextView"
-            android:textSize="18sp"
+            android:textSize="28sp"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
@@ -67,32 +67,33 @@
             android:layout_width="350dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="120dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
             android:background="@drawable/buttons_shape"
             android:text="CONTINUE AS "
-            android:textSize="16sp"
+            android:textSize="20sp"
             android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@+id/logoutCT"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintHorizontal_bias="0.488"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/messageTV"
-            app:layout_constraintVertical_bias="0.497" />
+            app:layout_constraintTop_toBottomOf="@+id/messageTV" />
 
         <TextView
             android:id="@+id/logoutCT"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:text="TextView"
+            android:text="Log out from this account"
+            android:textColor="@color/blue"
+            android:textSize="18sp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/continueAsBT" />
 
         <ProgressBar
             android:id="@+id/loadingUserPB"
@@ -192,6 +193,7 @@
             android:layout_marginStart="79dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="79dp"
+            android:background="@drawable/buttons_shape"
             android:gravity="center"
             android:text="Sing Up"
             android:visibility="visible"
@@ -220,7 +222,7 @@
     <android.support.constraint.ConstraintLayout
         android:id="@+id/loginLayout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="291dp"
         android:layout_marginTop="127dp"
         android:layout_marginBottom="66dp"
         android:visibility="gone"
@@ -235,12 +237,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="64dp"
             android:layout_marginEnd="8dp"
             android:ems="10"
             android:gravity="center"
             android:hint="Your email adress"
             android:inputType="textEmailAddress"
+            android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -256,6 +259,7 @@
             android:gravity="center"
             android:hint="Your password"
             android:inputType="textPassword"
+            android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/userEmailET" />
@@ -263,13 +267,13 @@
         <TextView
             android:id="@+id/createAccCT"
             android:layout_width="wrap_content"
-            android:layout_height="15dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:text="create new account"
             android:textColor="@color/blue"
-            android:textSize="12sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/userPasswordET" />
@@ -281,12 +285,26 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
+            android:background="@drawable/buttons_shape"
             android:gravity="center"
             android:text="Sign In"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.496"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/createAccCT" />
+
+        <ProgressBar
+            android:id="@+id/loginInPB"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>
