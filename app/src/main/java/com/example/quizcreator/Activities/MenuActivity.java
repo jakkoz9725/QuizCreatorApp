@@ -8,6 +8,7 @@ import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -29,6 +30,7 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindAnim;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -53,6 +55,29 @@ public class MenuActivity extends Activity {
         currentUserEmail = intent.getStringExtra("email");
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = mFirebaseDatabase.getReference("Quizzes");
+        startAnimation(flashAnimation,listOfQuizesBT);
+
+
+    }
+    public void startAnimation(Animation animation,View v){
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                v.setClickable(false);
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                v.setClickable(true);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        v.setAnimation(animation);
     }
 
     @BindView(R.id.searchListET)
@@ -69,6 +94,15 @@ public class MenuActivity extends Activity {
 
     @BindView(R.id.listOfQuizesBT)
     Button listOfQuizesBT;
+
+    @BindView(R.id.createNewQuizBT)
+    Button createNewQuizBT;
+
+    @OnClick(R.id.backToMenuBT)
+    public void onClickBackToMenuBT(){
+        listOfQuizes.setVisibility(View.GONE);
+        menuConstraintLayout.setVisibility(View.VISIBLE);
+    }
 
     @OnClick(R.id.listOfQuizesBT)
     public void showAllQuizes() {
@@ -181,4 +215,10 @@ public class MenuActivity extends Activity {
         });
         dialog.show();
     }
+
+    @BindAnim(R.anim.myanim)
+    Animation testAnim;
+
+    @BindAnim(R.anim.flash_anim)
+    Animation flashAnimation;
 }

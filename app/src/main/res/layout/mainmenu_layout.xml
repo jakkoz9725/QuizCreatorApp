@@ -9,14 +9,28 @@
     <android.support.constraint.ConstraintLayout
         android:id="@+id/listOfQuizesConstraintLayout"
         android:layout_width="420dp"
-        android:layout_height="674dp"
-        android:visibility="visible"
+        android:layout_height="0dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/topBarLayout"
         app:layout_constraintVertical_bias="0.0">
+
+        <Button
+            android:id="@+id/backToMenuBT"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="back to menu"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listOfQuizesLV" />
 
         <Button
             android:id="@+id/searchListBT"
@@ -43,15 +57,13 @@
         <ListView
             android:id="@+id/listOfQuizesLV"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="450dp"
             android:layout_marginTop="16dp"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/hintTV"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toBottomOf="@+id/hintTV" />
 
         <TextView
             android:id="@+id/hintTV"
@@ -70,7 +82,7 @@
         android:layout_width="match_parent"
         android:layout_height="500dp"
         android:layout_marginTop="8dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
