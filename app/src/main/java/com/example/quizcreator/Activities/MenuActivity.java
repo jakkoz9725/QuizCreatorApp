@@ -16,7 +16,9 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -92,6 +94,9 @@ public class MenuActivity extends Activity {
         });
         v.startAnimation(animation);
     }
+
+    @BindView(R.id.blockerLayout)
+    LinearLayout blockerLayout;
 
     @BindView(R.id.searchListET)
     EditText searchListET;

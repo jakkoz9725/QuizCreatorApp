@@ -7,16 +7,14 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
-import android.text.Layout;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +29,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import butterknife.BindAnim;
 import butterknife.BindDrawable;
 import butterknife.BindView;
@@ -43,6 +44,8 @@ public class LoginActivity extends Activity {
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private String loggedInAs;
+    private Pattern userNamePattern, emailPattern;
+    private Matcher matcher;
 
     @BindView(R.id.messageTV)
     TextView startMessageTV;
@@ -58,6 +61,8 @@ public class LoginActivity extends Activity {
     ImageView welcomeImage;
 
 
+    @BindView(R.id.blockerLayout)
+    LinearLayout blockerLayout;
     @BindView(R.id.loginLayout)
     ConstraintLayout loginLayout;
     @BindView(R.id.registerLayout)
@@ -77,8 +82,8 @@ public class LoginActivity extends Activity {
 
     @BindDrawable(R.drawable.ghost_emoji)
     Drawable ghostEmoji;
-    @BindView(R.id.imageViewEmoji)
-    ImageView imageViewEmoji;
+    @BindView(R.id.imageViewGhostEmoji)
+    ImageView imageViewGhostEmoji;
 
     @BindView(R.id.loginInPB)
     ProgressBar loginInPB;
@@ -100,8 +105,8 @@ public class LoginActivity extends Activity {
     Animation transparent_anim_disapear;
     @BindAnim(R.anim.transparent_anim_appear)
     Animation transparent_anim_appear;
-    @BindAnim(R.anim.ghost_emoji)
-    Animation ghost_emoji;
+    @BindAnim(R.anim.ghost_emoji_anim)
+    Animation ghost_emoji_anim;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -112,13 +117,45 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_menu_layout);
+
+        userNamePattern = Pattern.compile("[^a-z0-9]", Pattern.CASE_INSENSITIVE);
+        emailPattern = Pattern.compile("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*" +
+                "|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])" +
+                "*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]" +
+                "?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\" +
+                "x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])",Pattern.CASE_INSENSITIVE); // pattern from http://emailregex.com/
+
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference().child("Accounts");
+
         ButterKnife.bind(this);
         mAuth = FirebaseAuth.getInstance();
-        imageViewEmoji.setImageDrawable(ghostEmoji);
-        imageViewEmoji.startAnimation(ghost_emoji);
 
+        imageViewGhostEmoji.setImageDrawable(ghostEmoji);
+        scarryGhostAnim(ghost_emoji_anim, imageViewGhostEmoji);
+
+    }
+
+    public void scarryGhostAnim(Animation animation, View view) {
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                view.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.clearAnimation();
+                scarryGhostAnim(ghost_emoji_anim, imageViewGhostEmoji);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        view.setVisibility(View.INVISIBLE);
+        view.startAnimation(animation);
     }
 
     @OnClick(R.id.logoutCT)
@@ -145,13 +182,13 @@ public class LoginActivity extends Activity {
     }
 
     @OnClick(R.id.createAccCT)
-    public void OnClick() {
-    startAnimation(transparent_anim_appear,registerLayout,transparent_anim_disapear,loginLayout);
+    public void OnClickCreateNewAcc() {
+        startAnimation(transparent_anim_appear, registerLayout, transparent_anim_disapear, loginLayout);
     }
 
     @OnClick(R.id.loginCT)
     public void OnClickNext() {
-        startAnimation(transparent_anim_appear,loginLayout,transparent_anim_disapear,registerLayout);
+        startAnimation(transparent_anim_appear, loginLayout, transparent_anim_disapear, registerLayout);
     }
 
     @OnClick(R.id.createAccBT)
@@ -160,7 +197,9 @@ public class LoginActivity extends Activity {
         String newUserPassword = newUserPasswordET.getText().toString();
         String newUserPasswordRep = newUserPasswordRepET.getText().toString();
         String newUsername = newUsernameET.getText().toString();
-        if (newUserPassword.equals(newUserPasswordRep)) {
+       // isDataCorrect(newUsername, userNamePattern);
+        isDataCorrect(newUserEmail,emailPattern);
+       /* if (newUserPassword.equals(newUserPasswordRep)) {
             mAuth.createUserWithEmailAndPassword(newUserEmail, newUserPassword).addOnCompleteListener(this, task -> {
                 if (task.isSuccessful()) {
                     User user = new User(newUserEmail, newUsername, newUserPassword);
@@ -173,7 +212,7 @@ public class LoginActivity extends Activity {
             });
         } else {
             Toast.makeText(this, "Password do not match", Toast.LENGTH_SHORT).show();
-        }
+        }*/
     }
 
     @OnClick(R.id.signInBtn)
@@ -247,20 +286,67 @@ public class LoginActivity extends Activity {
             loginLayout.startAnimation(transparent_anim_appear);
         }
     }
-    public void blockClicks(View View, boolean block){
-        View.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return block;
-            }
-        });
+
+    public boolean matcher(String word, Pattern pattern) {
+        matcher = pattern.matcher(word);
+        return matcher.find();
     }
 
-    public void startAnimation(Animation animationApear, View viewApear,Animation animationDisapear, View viewDisapear) {
+    public boolean isDataCorrect(String userSendData, Pattern pattern) {
+        if(pattern.equals(userNamePattern)) {
+            if (userSendData.length() < 5) {
+                Toast.makeText(this, userMessagesForLogAndReg(pattern, 1), Toast.LENGTH_SHORT).show();
+                return false;
+            } else if (userSendData.length() > 10) {
+                Toast.makeText(this, userMessagesForLogAndReg(pattern, 2), Toast.LENGTH_SHORT).show();
+                return false;
+            } else if (matcher(userSendData, pattern)) {
+                Toast.makeText(this, userMessagesForLogAndReg(pattern, 3), Toast.LENGTH_SHORT).show();
+                return false;
+            } else {
+                Toast.makeText(this, userMessagesForLogAndReg(pattern, 4), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        } else if (pattern.equals(emailPattern)) {
+            if(!matcher(userSendData,pattern)){
+                Toast.makeText(this, userMessagesForLogAndReg(emailPattern,1), Toast.LENGTH_SHORT).show();
+                return false;
+            }else{
+                Toast.makeText(this, userMessagesForLogAndReg(emailPattern,2), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        }
+       return false;
+    }
+    public String userMessagesForLogAndReg(Pattern pattern, int whichOne) {
+        if (pattern.equals(userNamePattern)) {
+            switch (whichOne) {
+                case 1:
+                    return "Your username need to be between 5-10 characters";
+                case 2:
+                    return "Your username need to be between 5-10 characters";
+                case 3:
+                    return "You can only use letters and numbers for username";
+                case 4:
+                    return "Well done, checking data";
+            }
+        }else if(pattern.equals(emailPattern)){
+            switch (whichOne){
+                case 1:
+                    return "email is incorrect";
+                case 2:
+                    return "Good";
+
+            }
+        }
+        return null;
+    }
+
+    public void startAnimation(Animation animationApear, View viewApear, Animation animationDisapear, View viewDisapear) {
         animationDisapear.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                blockClicks(viewDisapear,true);
+                blockerLayout.setVisibility(View.VISIBLE);
                 viewDisapear.setVisibility(View.GONE);
                 viewDisapear.startAnimation(animation);
 
@@ -268,12 +354,12 @@ public class LoginActivity extends Activity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                blockClicks(viewDisapear,false);
+                blockerLayout.setVisibility(View.GONE);
                 viewApear.setVisibility(View.VISIBLE);
                 viewApear.setClickable(true);
                 viewApear.startAnimation(animationApear);
             }
-            
+
             @Override
             public void onAnimationRepeat(Animation animation) {
 
