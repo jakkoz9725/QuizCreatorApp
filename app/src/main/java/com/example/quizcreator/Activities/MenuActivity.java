@@ -70,7 +70,6 @@ public class MenuActivity extends Activity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = mFirebaseDatabase.getReference("Quizzes");
 
-
     }
 
 
@@ -95,8 +94,8 @@ public class MenuActivity extends Activity {
         v.startAnimation(animation);
     }
 
-    @BindView(R.id.blockerLayout)
-    LinearLayout blockerLayout;
+   // @BindView(R.id.blockerLayout)
+    //LinearLayout blockerLayout;
 
     @BindView(R.id.searchListET)
     EditText searchListET;

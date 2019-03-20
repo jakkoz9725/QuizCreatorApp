@@ -19,9 +19,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.quizcreator.Classes.Patterns;
 import com.example.quizcreator.Classes.User;
 import com.example.quizcreator.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,6 +34,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,6 +43,8 @@ import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnFocusChange;
+import butterknife.OnTextChanged;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LoginActivity extends Activity {
@@ -44,8 +52,9 @@ public class LoginActivity extends Activity {
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private String loggedInAs;
-    private Pattern userNamePattern, emailPattern;
-    private Matcher matcher;
+    private Patterns patterns;
+
+    private boolean usernameWarningBool, passwordWarningBool, passwordRepWarningBool, emialWarningBool;
 
     @BindView(R.id.messageTV)
     TextView startMessageTV;
@@ -85,6 +94,18 @@ public class LoginActivity extends Activity {
     @BindView(R.id.imageViewGhostEmoji)
     ImageView imageViewGhostEmoji;
 
+    @BindView(R.id.usernameWarning)
+    TextView usernameWarning;
+    @BindView(R.id.passwordWarning)
+    TextView passwordWarning;
+    @BindView(R.id.passwordRepWarning)
+    TextView passwordRepWarning;
+    @BindView(R.id.emailWarning)
+    TextView emailWarning;
+
+
+    @BindView(R.id.registerPB)
+    ProgressBar registerPB;
     @BindView(R.id.loginInPB)
     ProgressBar loginInPB;
     @BindView(R.id.newUsernameET)
@@ -117,13 +138,7 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_menu_layout);
-
-        userNamePattern = Pattern.compile("[^a-z0-9]", Pattern.CASE_INSENSITIVE);
-        emailPattern = Pattern.compile("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*" +
-                "|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])" +
-                "*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]" +
-                "?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\" +
-                "x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])",Pattern.CASE_INSENSITIVE); // pattern from http://emailregex.com/
+        patterns = new Patterns(this);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference().child("Accounts");
@@ -191,52 +206,132 @@ public class LoginActivity extends Activity {
         startAnimation(transparent_anim_appear, loginLayout, transparent_anim_disapear, registerLayout);
     }
 
+    @OnTextChanged(R.id.newUserEmailET)
+    public void onTextChangedEmailET() {
+        emialWarningBool = patterns.isDataCorrect(newUserEmailET.getText().toString(), patterns.getEmailAdressPattern());
+        if (emialWarningBool) {
+            emailWarning.setTextColor(getColor(R.color.green));
+        } else {
+            emailWarning.setTextColor(getColor(R.color.colorWhite));
+        }
+    }
+
+    @OnTextChanged(R.id.newUsernameET)
+    public void onTextChangedUsernameET() {
+        usernameWarningBool = patterns.isDataCorrect(newUsernameET.getText().toString(), patterns.getUserNamePattern());
+        if (usernameWarningBool) {
+            usernameWarning.setTextColor(getColor(R.color.green));
+        } else {
+            usernameWarning.setTextColor(getColor(R.color.colorWhite));
+        }
+    }
+
+    @OnTextChanged(R.id.newUserPasswordET)
+    public void onTextChangednewUserPasswordET() {
+        passwordWarningBool = patterns.isDataCorrect(newUserPasswordET.getText().toString(), patterns.getPasswordPattern());
+        if (passwordWarningBool) {
+            passwordWarning.setTextColor(getColor(R.color.green));
+        } else {
+            passwordWarning.setTextColor(getColor(R.color.colorWhite));
+        }
+        if (newUserPasswordRepET.getText().toString().equals(newUserPasswordET.getText().toString()) && passwordWarningBool) {
+            passwordRepWarningBool = true;
+            passwordRepWarning.setTextColor(getColor(R.color.green));
+        } else {
+            passwordRepWarningBool = false;
+            passwordRepWarning.setTextColor(getColor(R.color.colorWhite));
+        }
+    }
+
+    @OnTextChanged(R.id.newUserPasswordRepET)
+    public void onTextChangednewUserPasswordRepET() {
+        String newUserPwRep = newUserPasswordRepET.getText().toString();
+        if (newUserPwRep.length() != 0 && newUserPwRep.equals(newUserPasswordET.getText().toString()) && passwordWarningBool) {
+            passwordRepWarningBool = true;
+            passwordRepWarning.setTextColor(getColor(R.color.green));
+        } else {
+            passwordRepWarningBool = false;
+            passwordRepWarning.setTextColor(getColor(R.color.colorWhite));
+        }
+    }
+
     @OnClick(R.id.createAccBT)
     public void createNewUser() {
-        String newUserEmail = newUserEmailET.getText().toString();
-        String newUserPassword = newUserPasswordET.getText().toString();
-        String newUserPasswordRep = newUserPasswordRepET.getText().toString();
-        String newUsername = newUsernameET.getText().toString();
-       // isDataCorrect(newUsername, userNamePattern);
-        isDataCorrect(newUserEmail,emailPattern);
-       /* if (newUserPassword.equals(newUserPasswordRep)) {
+        if (usernameWarningBool && passwordWarningBool && passwordRepWarningBool && emialWarningBool) {
+            String newUserEmail = newUserEmailET.getText().toString();
+            String newUserPassword = newUserPasswordET.getText().toString();
+            String newUsername = newUsernameET.getText().toString();
+            registerPB.setVisibility(View.VISIBLE);
+            checkIsUsernameAlreadyTaken(newUsername);
+        } else {
+            Toast.makeText(this, "Check list", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public void createNewUserPart2(boolean usernameTaken) {
+        if (!usernameTaken) {
+            String newUserEmail = newUserEmailET.getText().toString();
+            String newUserPassword = newUserPasswordET.getText().toString();
+            String newUsername = newUsernameET.getText().toString();
             mAuth.createUserWithEmailAndPassword(newUserEmail, newUserPassword).addOnCompleteListener(this, task -> {
                 if (task.isSuccessful()) {
                     User user = new User(newUserEmail, newUsername, newUserPassword);
                     databaseReference.child(newUsername).setValue(user);
                     Toast.makeText(LoginActivity.this, "Created Succesfully", Toast.LENGTH_SHORT).show();
-                } else {
-                    Log.w("LoginActivity", "Failed", task.getException());
-                    Toast.makeText(LoginActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(this, MenuActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.transparent_anim_appear, R.anim.transparent_anim_disapear);
+                } else try {
+                    throw task.getException();
+                } catch (FirebaseAuthUserCollisionException existEmail) {
+                    Toast.makeText(this, "Email already used in this app", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(this, "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
+                registerPB.setVisibility(View.GONE);
             });
         } else {
-            Toast.makeText(this, "Password do not match", Toast.LENGTH_SHORT).show();
-        }*/
+            Toast.makeText(this, "Username already taken", Toast.LENGTH_SHORT).show();
+            registerPB.setVisibility(View.GONE);
+        }
     }
-
     @OnClick(R.id.signInBtn)
     public void signIn() {
-        loginInPB.setVisibility(View.VISIBLE);
         String email = userEmailET.getText().toString();
         String password = userPasswordET.getText().toString();
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
-                        loginInPB.setVisibility(View.GONE);
-                        Toast.makeText(this, "Logged in", Toast.LENGTH_SHORT).show();
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        Intent intent = new Intent(this, MenuActivity.class);
-                        intent.putExtra("email", user.getEmail());
-                        startActivity(intent);
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        loginInPB.setVisibility(View.GONE);
-                        task.getException().printStackTrace();
-                        Toast.makeText(this, "Email or password incorrect", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        boolean isEmailCorrect = patterns.isDataCorrect(email, patterns.getEmailAdressPattern());
+        if(password.length() == 0){
+            Toast.makeText(this, "You need password", Toast.LENGTH_SHORT).show();
+        }else {
+            if (isEmailCorrect) {
+                loginInPB.setVisibility(View.VISIBLE);
+                mAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(this, task -> {
+                            if (task.isSuccessful()) {
+                                loginInPB.setVisibility(View.GONE);
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                Intent intent = new Intent(this, MenuActivity.class);
+                                intent.putExtra("email", user.getEmail());
+                                startActivity(intent);
+                                overridePendingTransition(R.anim.transparent_anim_appear, R.anim.transparent_anim_disapear);
+                            } else {
+                                try {
+                                    throw task.getException();
+                                } catch (FirebaseAuthInvalidUserException invalidEmail) {
+                                    Toast.makeText(this, "This email is not registered", Toast.LENGTH_SHORT).show();
+                                } catch (FirebaseAuthInvalidCredentialsException wrongPassword) {
+                                    Toast.makeText(this, "Wrong password", Toast.LENGTH_SHORT).show();
+
+                                } catch (Exception e) {
+                                    Toast.makeText(this, "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                            loginInPB.setVisibility(View.GONE);
+                        });
+            } else {
+                loginInPB.setVisibility(View.GONE);
+                Toast.makeText(this, "Email format is not correct", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @OnClick(R.id.continueAsBT)
@@ -287,59 +382,27 @@ public class LoginActivity extends Activity {
         }
     }
 
-    public boolean matcher(String word, Pattern pattern) {
-        matcher = pattern.matcher(word);
-        return matcher.find();
-    }
+    public void checkIsUsernameAlreadyTaken(String newNickname){
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            ArrayList<String> usersNames = new ArrayList();
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot ds : dataSnapshot.getChildren()){
+                    usersNames.add(ds.getValue(User.class).getUserName());
+                    }
+                if(usersNames.contains(newNickname)){
+                    createNewUserPart2(true);
+                }else{
+                    createNewUserPart2(false);
+                }
+            }
 
-    public boolean isDataCorrect(String userSendData, Pattern pattern) {
-        if(pattern.equals(userNamePattern)) {
-            if (userSendData.length() < 5) {
-                Toast.makeText(this, userMessagesForLogAndReg(pattern, 1), Toast.LENGTH_SHORT).show();
-                return false;
-            } else if (userSendData.length() > 10) {
-                Toast.makeText(this, userMessagesForLogAndReg(pattern, 2), Toast.LENGTH_SHORT).show();
-                return false;
-            } else if (matcher(userSendData, pattern)) {
-                Toast.makeText(this, userMessagesForLogAndReg(pattern, 3), Toast.LENGTH_SHORT).show();
-                return false;
-            } else {
-                Toast.makeText(this, userMessagesForLogAndReg(pattern, 4), Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        } else if (pattern.equals(emailPattern)) {
-            if(!matcher(userSendData,pattern)){
-                Toast.makeText(this, userMessagesForLogAndReg(emailPattern,1), Toast.LENGTH_SHORT).show();
-                return false;
-            }else{
-                Toast.makeText(this, userMessagesForLogAndReg(emailPattern,2), Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        }
-       return false;
-    }
-    public String userMessagesForLogAndReg(Pattern pattern, int whichOne) {
-        if (pattern.equals(userNamePattern)) {
-            switch (whichOne) {
-                case 1:
-                    return "Your username need to be between 5-10 characters";
-                case 2:
-                    return "Your username need to be between 5-10 characters";
-                case 3:
-                    return "You can only use letters and numbers for username";
-                case 4:
-                    return "Well done, checking data";
-            }
-        }else if(pattern.equals(emailPattern)){
-            switch (whichOne){
-                case 1:
-                    return "email is incorrect";
-                case 2:
-                    return "Good";
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        }
-        return null;
+
+        });
     }
 
     public void startAnimation(Animation animationApear, View viewApear, Animation animationDisapear, View viewDisapear) {
