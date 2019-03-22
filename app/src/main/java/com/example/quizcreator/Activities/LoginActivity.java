@@ -7,8 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Button;
@@ -17,16 +15,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.quizcreator.Classes.LoginClass;
 import com.example.quizcreator.Classes.Patterns;
+import com.example.quizcreator.Classes.RegisterClass;
 import com.example.quizcreator.Classes.User;
 import com.example.quizcreator.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseAuthInvalidUserException;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,26 +30,25 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import butterknife.BindAnim;
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnFocusChange;
 import butterknife.OnTextChanged;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LoginActivity extends Activity {
     private FirebaseAuth mAuth;
-    private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private String loggedInAs;
-    private Patterns patterns;
-
-    private boolean usernameWarningBool, passwordWarningBool, passwordRepWarningBool, emialWarningBool;
+    private LoginClass loginClass;
+    private RegisterClass registerClass;
 
     @BindView(R.id.messageTV)
     TextView startMessageTV;
@@ -68,8 +62,6 @@ public class LoginActivity extends Activity {
     ProgressBar loadingUserPB;
     @BindView(R.id.welcomeImage)
     ImageView welcomeImage;
-
-
     @BindView(R.id.blockerLayout)
     LinearLayout blockerLayout;
     @BindView(R.id.loginLayout)
@@ -78,8 +70,6 @@ public class LoginActivity extends Activity {
     ConstraintLayout registerLayout;
     @BindView(R.id.appStartLayout)
     ConstraintLayout appStartLayout;
-
-
     @BindView(R.id.userEmailET)
     EditText userEmailET;
     @BindView(R.id.userPasswordET)
@@ -88,22 +78,18 @@ public class LoginActivity extends Activity {
     Button acceptBT;
     @BindView(R.id.createAccCT)
     TextView createAccCT;
-
     @BindDrawable(R.drawable.ghost_emoji)
     Drawable ghostEmoji;
     @BindView(R.id.imageViewGhostEmoji)
     ImageView imageViewGhostEmoji;
-
-    @BindView(R.id.usernameWarning)
-    TextView usernameWarning;
-    @BindView(R.id.passwordWarning)
-    TextView passwordWarning;
-    @BindView(R.id.passwordRepWarning)
-    TextView passwordRepWarning;
-    @BindView(R.id.emailWarning)
-    TextView emailWarning;
-
-
+    @BindView(R.id.usernameRequirement)
+    TextView usernameRequirement;
+    @BindView(R.id.passwordRequirement)
+    TextView passwordRequirement;
+    @BindView(R.id.passwordRepRequirement)
+    TextView passwordRepRequirement;
+    @BindView(R.id.emailRequirement)
+    TextView emailRequirement;
     @BindView(R.id.registerPB)
     ProgressBar registerPB;
     @BindView(R.id.loginInPB)
@@ -138,16 +124,31 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_menu_layout);
-        patterns = new Patterns(this);
-
-        firebaseDatabase = FirebaseDatabase.getInstance();
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference().child("Accounts");
-
         ButterKnife.bind(this);
         mAuth = FirebaseAuth.getInstance();
-
         imageViewGhostEmoji.setImageDrawable(ghostEmoji);
         scarryGhostAnim(ghost_emoji_anim, imageViewGhostEmoji);
+        overridePendingTransition(R.anim.transparent_anim_appear, R.anim.transparent_anim_disapear);
+        Patterns patterns = new Patterns(this);
+
+
+        loginClass = new LoginClass.Builder()
+                .loginProgressBar(loginInPB)
+                .activityContext(this)
+                .firebaseAuth(mAuth)
+                .patterns(patterns)
+                .build();
+        registerClass = new RegisterClass.Builder()
+                .activityContext(this)
+                .textViewsRequirments(passwordRequirement,passwordRepRequirement,emailRequirement,usernameRequirement)
+                .firebaseAuth(mAuth)
+                .databaseReference(databaseReference)
+                .patterns(patterns)
+                .colors(getColor(R.color.colorWhite),getColor(R.color.green))
+                .progressBar(registerPB)
+                .build();
 
     }
 
@@ -207,138 +208,43 @@ public class LoginActivity extends Activity {
     }
 
     @OnTextChanged(R.id.newUserEmailET)
-    public void onTextChangedEmailET() {
-        emialWarningBool = patterns.isDataCorrect(newUserEmailET.getText().toString(), patterns.getEmailAdressPattern());
-        if (emialWarningBool) {
-            emailWarning.setTextColor(getColor(R.color.green));
-        } else {
-            emailWarning.setTextColor(getColor(R.color.colorWhite));
-        }
+    public void onEmailETChange() {
+        registerClass.emailIsCorrect(newUserEmailET.getText().toString());
     }
 
     @OnTextChanged(R.id.newUsernameET)
-    public void onTextChangedUsernameET() {
-        usernameWarningBool = patterns.isDataCorrect(newUsernameET.getText().toString(), patterns.getUserNamePattern());
-        if (usernameWarningBool) {
-            usernameWarning.setTextColor(getColor(R.color.green));
-        } else {
-            usernameWarning.setTextColor(getColor(R.color.colorWhite));
-        }
+    public void onTextUsernameETChange() {
+        registerClass.usernameIsCorrect(newUsernameET.getText().toString());
     }
 
     @OnTextChanged(R.id.newUserPasswordET)
-    public void onTextChangednewUserPasswordET() {
-        passwordWarningBool = patterns.isDataCorrect(newUserPasswordET.getText().toString(), patterns.getPasswordPattern());
-        if (passwordWarningBool) {
-            passwordWarning.setTextColor(getColor(R.color.green));
-        } else {
-            passwordWarning.setTextColor(getColor(R.color.colorWhite));
-        }
-        if (newUserPasswordRepET.getText().toString().equals(newUserPasswordET.getText().toString()) && passwordWarningBool) {
-            passwordRepWarningBool = true;
-            passwordRepWarning.setTextColor(getColor(R.color.green));
-        } else {
-            passwordRepWarningBool = false;
-            passwordRepWarning.setTextColor(getColor(R.color.colorWhite));
-        }
+    public void onTextPasswordETChange() {
+        registerClass.passwordIsCorrect(newUserPasswordET.getText().toString(), newUserPasswordRepET.getText().toString());
     }
 
     @OnTextChanged(R.id.newUserPasswordRepET)
-    public void onTextChangednewUserPasswordRepET() {
-        String newUserPwRep = newUserPasswordRepET.getText().toString();
-        if (newUserPwRep.length() != 0 && newUserPwRep.equals(newUserPasswordET.getText().toString()) && passwordWarningBool) {
-            passwordRepWarningBool = true;
-            passwordRepWarning.setTextColor(getColor(R.color.green));
-        } else {
-            passwordRepWarningBool = false;
-            passwordRepWarning.setTextColor(getColor(R.color.colorWhite));
-        }
+    public void onTextPasswordRepETChange() {
+        registerClass.passwordRepIsCorrect(newUserPasswordRepET.getText().toString(),newUserPasswordET.getText().toString());
     }
 
     @OnClick(R.id.createAccBT)
-    public void createNewUser() {
-        if (usernameWarningBool && passwordWarningBool && passwordRepWarningBool && emialWarningBool) {
-            String newUserEmail = newUserEmailET.getText().toString();
-            String newUserPassword = newUserPasswordET.getText().toString();
-            String newUsername = newUsernameET.getText().toString();
-            registerPB.setVisibility(View.VISIBLE);
-            checkIsUsernameAlreadyTaken(newUsername);
-        } else {
-            Toast.makeText(this, "Check list", Toast.LENGTH_SHORT).show();
-        }
-    }
-    public void createNewUserPart2(boolean usernameTaken) {
-        if (!usernameTaken) {
-            String newUserEmail = newUserEmailET.getText().toString();
-            String newUserPassword = newUserPasswordET.getText().toString();
-            String newUsername = newUsernameET.getText().toString();
-            mAuth.createUserWithEmailAndPassword(newUserEmail, newUserPassword).addOnCompleteListener(this, task -> {
-                if (task.isSuccessful()) {
-                    User user = new User(newUserEmail, newUsername, newUserPassword);
-                    databaseReference.child(newUsername).setValue(user);
-                    Toast.makeText(LoginActivity.this, "Created Succesfully", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(this, MenuActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.transparent_anim_appear, R.anim.transparent_anim_disapear);
-                } else try {
-                    throw task.getException();
-                } catch (FirebaseAuthUserCollisionException existEmail) {
-                    Toast.makeText(this, "Email already used in this app", Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
-                    Toast.makeText(this, "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-                registerPB.setVisibility(View.GONE);
-            });
-        } else {
-            Toast.makeText(this, "Username already taken", Toast.LENGTH_SHORT).show();
-            registerPB.setVisibility(View.GONE);
-        }
+    public void tryToCreate(){
+        Map<String, String> map = new HashMap<>();
+        map.put("userEmail",newUserEmailET.getText().toString());
+        map.put("userName",newUsernameET.getText().toString());
+        map.put("userPassword",newUserPasswordET.getText().toString());
+        registerClass.checkIsUsernameAlreadyTaken(map);
     }
     @OnClick(R.id.signInBtn)
-    public void signIn() {
-        String email = userEmailET.getText().toString();
-        String password = userPasswordET.getText().toString();
-        boolean isEmailCorrect = patterns.isDataCorrect(email, patterns.getEmailAdressPattern());
-        if(password.length() == 0){
-            Toast.makeText(this, "You need password", Toast.LENGTH_SHORT).show();
-        }else {
-            if (isEmailCorrect) {
-                loginInPB.setVisibility(View.VISIBLE);
-                mAuth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(this, task -> {
-                            if (task.isSuccessful()) {
-                                loginInPB.setVisibility(View.GONE);
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                Intent intent = new Intent(this, MenuActivity.class);
-                                intent.putExtra("email", user.getEmail());
-                                startActivity(intent);
-                                overridePendingTransition(R.anim.transparent_anim_appear, R.anim.transparent_anim_disapear);
-                            } else {
-                                try {
-                                    throw task.getException();
-                                } catch (FirebaseAuthInvalidUserException invalidEmail) {
-                                    Toast.makeText(this, "This email is not registered", Toast.LENGTH_SHORT).show();
-                                } catch (FirebaseAuthInvalidCredentialsException wrongPassword) {
-                                    Toast.makeText(this, "Wrong password", Toast.LENGTH_SHORT).show();
-
-                                } catch (Exception e) {
-                                    Toast.makeText(this, "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                            loginInPB.setVisibility(View.GONE);
-                        });
-            } else {
-                loginInPB.setVisibility(View.GONE);
-                Toast.makeText(this, "Email format is not correct", Toast.LENGTH_SHORT).show();
-            }
-        }
+    public void LoginWithEmailAndPassword() {
+        loginClass.loginWithEmailAndPassword(userEmailET.getText().toString(),userPasswordET.getText().toString());
     }
 
     @OnClick(R.id.continueAsBT)
-    public void onContinueAsBTclick() {
+    public void onContinueAsBTClick() {
         Intent intent = new Intent(this, MenuActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.putExtra("email", mAuth.getCurrentUser().getEmail());
+        intent.putExtra("email", Objects.requireNonNull(mAuth.getCurrentUser()).getEmail());
         startActivity(intent);
         overridePendingTransition(R.anim.transparent_anim_appear, R.anim.transparent_anim_disapear);
     }
@@ -355,10 +261,8 @@ public class LoginActivity extends Activity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        if (ds.getValue(User.class).getEmail().equals(currentUser.getEmail())) {
-                            loggedInAs = ds.getValue(User.class).getUserName();
-                        } else {
-                            continue;
+                        if (Objects.requireNonNull(ds.getValue(User.class)).getEmail().equals(currentUser.getEmail())) {
+                            loggedInAs = Objects.requireNonNull(ds.getValue(User.class)).getUserName();
                         }
                     }
                     loginAsTV.setVisibility(View.VISIBLE);
@@ -381,30 +285,6 @@ public class LoginActivity extends Activity {
             loginLayout.startAnimation(transparent_anim_appear);
         }
     }
-
-    public void checkIsUsernameAlreadyTaken(String newNickname){
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            ArrayList<String> usersNames = new ArrayList();
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()){
-                    usersNames.add(ds.getValue(User.class).getUserName());
-                    }
-                if(usersNames.contains(newNickname)){
-                    createNewUserPart2(true);
-                }else{
-                    createNewUserPart2(false);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-
-        });
-    }
-
     public void startAnimation(Animation animationApear, View viewApear, Animation animationDisapear, View viewDisapear) {
         animationDisapear.setAnimationListener(new Animation.AnimationListener() {
             @Override

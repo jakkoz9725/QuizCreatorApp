@@ -311,7 +311,7 @@
                 app:layout_constraintVertical_bias="1.0">
 
                 <TextView
-                    android:id="@+id/usernameWarning"
+                    android:id="@+id/usernameRequirement"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -325,7 +325,7 @@
                     android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/emailWarning"
+                    android:id="@+id/emailRequirement"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -338,7 +338,7 @@
                     android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/passwordWarning"
+                    android:id="@+id/passwordRequirement"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -351,7 +351,7 @@
                     android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/passwordRepWarning"
+                    android:id="@+id/passwordRepRequirement"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
