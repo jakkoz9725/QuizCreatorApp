@@ -15,7 +15,6 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,6 +23,7 @@ import android.widget.Toast;
 import com.example.quizcreator.Classes.DialogOverride;
 import com.example.quizcreator.Classes.Patterns;
 import com.example.quizcreator.Classes.Quiz;
+import com.example.quizcreator.Classes.User;
 import com.example.quizcreator.QuizArrayListAdapter;
 import com.example.quizcreator.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -51,7 +51,10 @@ public class MenuActivity extends Activity {
     List<Quiz> quizList;
     boolean quizNameIsCorrect = false;
     Patterns patterns;
+    private String currentlyLoggedInUserName;
     private DatabaseReference databaseReference;
+    private DatabaseReference myRefAccounts;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -69,6 +72,9 @@ public class MenuActivity extends Activity {
         patterns = new Patterns(this);
         FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = mFirebaseDatabase.getReference("Quizzes");
+        myRefAccounts = mFirebaseDatabase.getReference("Accounts");
+        mAuth = FirebaseAuth.getInstance();
+        getCurrentUsername();
     }
 
 
@@ -106,13 +112,19 @@ public class MenuActivity extends Activity {
     ConstraintLayout listOfQuizzesConstraintLayout;
 
     @BindView(R.id.listOfQuizesLV)
-    ListView listOFQuizzesLV;
+    ListView listOfQuizzesLV;
+    
+    @BindView(R.id.listOfMyQuizzesLV)
+    ListView listOfMyQuizzesLV;
 
     @BindView(R.id.listOfQuizzesBT)
     Button listOfQuizzes;
 
     @BindView(R.id.createNewQuizBT)
     Button createNewQuizBT;
+
+    @BindView(R.id.listOfMyQuizesBtn)
+    Button listOfMyQuizesBtn;
 
     @BindView(R.id.settingsLayout)
     ConstraintLayout settingsLayout;
@@ -123,14 +135,35 @@ public class MenuActivity extends Activity {
     @BindView(R.id.logoutBT)
     Button logoutBT;
 
+    public void getCurrentUsername() {
+        myRefAccounts.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    if (ds.getValue(User.class).getEmail().equals(mAuth.getCurrentUser().getEmail())) {
+                        currentlyLoggedInUserName = ds.getValue(User.class).getUserName();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
+    }
+
     @OnClick(R.id.backToMenuBT)
     public void onClickBackToMenuBT() {
         listOfQuizzesConstraintLayout.setVisibility(View.GONE);
+        listOfQuizzesLV.setVisibility(View.GONE);
+        listOfMyQuizzesLV.setVisibility(View.GONE);
         menuConstraintLayout.setVisibility(View.VISIBLE);
     }
 
     @OnClick(R.id.listOfQuizzesBT)
     public void showAllQuizes() {
+        listOfQuizzesLV.setVisibility(View.VISIBLE);
         startAnimation(transparent_anim_disapear, menuConstraintLayout, listOfQuizzesConstraintLayout);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -143,7 +176,35 @@ public class MenuActivity extends Activity {
                     quizList.add(quiz);
                 }
                 QuizArrayListAdapter adapter = new QuizArrayListAdapter(MenuActivity.this, quizList);
-                listOFQuizzesLV.setAdapter(adapter);
+                listOfQuizzesLV.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    @OnClick(R.id.listOfMyQuizesBtn)
+    public void showMyQuizes() {
+        listOfMyQuizzesLV.setVisibility(View.VISIBLE);
+        startAnimation(transparent_anim_disapear, menuConstraintLayout, listOfQuizzesConstraintLayout);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                quizList.clear();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Quiz quiz = new Quiz();
+                    quiz.setCreatorUsername(Objects.requireNonNull(ds.getValue(Quiz.class)).getCreatorUsername());
+                    quiz.setQuizName(Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName());
+                    if(quiz.getCreatorUsername().equals(currentlyLoggedInUserName)) {
+                        quizList.add(quiz);
+                    }
+                }
+
+                QuizArrayListAdapter adapter = new QuizArrayListAdapter(MenuActivity.this, quizList);
+                listOfMyQuizzesLV.setAdapter(adapter);
             }
 
             @Override
@@ -196,7 +257,7 @@ public class MenuActivity extends Activity {
                     }
                 }
                 QuizArrayListAdapter adapter = new QuizArrayListAdapter(MenuActivity.this, quizList);
-                listOFQuizzesLV.setAdapter(adapter);
+                listOfQuizzesLV.setAdapter(adapter);
             }
 
             @Override
@@ -347,7 +408,7 @@ public class MenuActivity extends Activity {
             settings_menu_disappear.setAnimationListener(new AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
-                blockerLayout.setClickable(false);
+                    blockerLayout.setClickable(false);
                 }
 
                 @Override

@@ -10,28 +10,53 @@
         android:id="@+id/listOfQuizzesConstraintLayout"
         android:layout_width="420dp"
         android:layout_height="0dp"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/topBarLayout"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintVertical_bias="0.0"
+        tools:visibility="gone">
+
+        <ListView
+            android:id="@+id/listOfMyQuizzesLV"
+            android:layout_width="0dp"
+            android:layout_height="450dp"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/hintTV"
+            tools:visibility="gone" />
+
+        <ListView
+            android:id="@+id/listOfQuizesLV"
+            android:layout_width="0dp"
+            android:layout_height="450dp"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/hintTV"
+            tools:visibility="gone" />
 
         <Button
             android:id="@+id/backToMenuBT"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginBottom="60dp"
             android:background="@drawable/buttons_shape"
             android:text="back to menu"
             android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/listOfQuizzesLV" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/searchListBT"
@@ -56,17 +81,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ListView
-            android:id="@+id/listOfQuizesLV"
-            android:layout_width="0dp"
-            android:layout_height="450dp"
-            android:layout_marginTop="16dp"
-            android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/hintTV" />
-
         <TextView
             android:id="@+id/hintTV"
             android:layout_width="wrap_content"
@@ -84,7 +98,7 @@
         android:layout_width="match_parent"
         android:layout_height="500dp"
         android:layout_marginTop="8dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -93,14 +107,32 @@
         app:layout_constraintVertical_bias="0.272">
 
         <Button
+            android:id="@+id/listOfMyQuizesBtn"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/buttons_shape"
+            android:text="Show my quizes"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listOfQuizzesBT" />
+
+        <Button
             android:id="@+id/createNewQuizBT"
             android:layout_width="150dp"
             android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="116dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/buttons_shape"
             android:text="Create new quiz"
             android:visibility="visible"
-            tools:layout_editor_absoluteX="131dp"
-            tools:layout_editor_absoluteY="104dp" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.502"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/listOfQuizzesBT"
