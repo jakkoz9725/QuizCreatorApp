@@ -3,10 +3,12 @@ package com.example.quizcreator.Activities;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.VoiceInteractor;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -48,7 +50,9 @@ public class MenuActivity extends Activity {
 
     String currentUserEmail;
     Dialog dialog;
+    Dialog checkMyQuizDialogue;
     List<Quiz> quizList;
+    List<Quiz> myQuizList;
     boolean quizNameIsCorrect = false;
     Patterns patterns;
     private String currentlyLoggedInUserName;
@@ -68,6 +72,7 @@ public class MenuActivity extends Activity {
         ButterKnife.bind(this);
         Intent intent = getIntent();
         quizList = new ArrayList<>();
+        myQuizList = new ArrayList<>();
         currentUserEmail = intent.getStringExtra("email");
         patterns = new Patterns(this);
         FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -169,8 +174,7 @@ public class MenuActivity extends Activity {
     @OnClick(R.id.backToMenuBT)
     public void onClickBackToMenuBT() {
         startAnimation(transparent_anim_disapear, listOfQuizzesConstraintLayout, menuConstraintLayout);
-        //listOfQuizzesConstraintLayout.setVisibility(View.GONE);
-        //menuConstraintLayout.setVisibility(View.VISIBLE);
+        searchListET.setText("");
     }
 
     @OnClick(R.id.listOfQuizzesBT)
@@ -189,6 +193,8 @@ public class MenuActivity extends Activity {
                 }
                 QuizArrayListAdapter adapter = new QuizArrayListAdapter(MenuActivity.this, quizList);
                 listOfQuizzesLV.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+                listOfQuizzesLV.requestLayout();
             }
 
             @Override
@@ -205,18 +211,19 @@ public class MenuActivity extends Activity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                quizList.clear();
+                myQuizList.clear();
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     Quiz quiz = new Quiz();
                     quiz.setCreatorUsername(Objects.requireNonNull(ds.getValue(Quiz.class)).getCreatorUsername());
                     quiz.setQuizName(Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName());
                     if (quiz.getCreatorUsername().equals(currentlyLoggedInUserName)) {
-                        quizList.add(quiz);
+                        myQuizList.add(quiz);
                     }
                 }
-
-                QuizArrayListAdapter adapter = new QuizArrayListAdapter(MenuActivity.this, quizList);
+                QuizArrayListAdapter adapter = new QuizArrayListAdapter(MenuActivity.this, myQuizList);
                 listOfMyQuizzesLV.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+                listOfMyQuizzesLV.requestLayout();
             }
 
             @Override
@@ -225,11 +232,37 @@ public class MenuActivity extends Activity {
             }
         });
     }
+    public void showMyQuizzesAfterDelete(){
+            //listOfMyQuizzesLV.setVisibility(View.VISIBLE);
+            //startAnimation(transparent_anim_disapear, menuConstraintLayout, listOfQuizzesConstraintLayout);
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    myQuizList.clear();
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        Quiz quiz = new Quiz();
+                        quiz.setCreatorUsername(Objects.requireNonNull(ds.getValue(Quiz.class)).getCreatorUsername());
+                        quiz.setQuizName(Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName());
+                        if (quiz.getCreatorUsername().equals(currentlyLoggedInUserName)) {
+                            myQuizList.add(quiz);
+                        }
+                    }
+                    QuizArrayListAdapter adapter = new QuizArrayListAdapter(MenuActivity.this, myQuizList);
+                    listOfMyQuizzesLV.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                    listOfMyQuizzesLV.requestLayout();
+                }
 
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+    }
     @SuppressLint("SetTextI18n")
 
     @OnItemClick(R.id.listOfQuizesLV)
-    public void onItemListClick(int i) {
+    public void onItemListClickAllQuizzes(int i) {
         Quiz quiz = quizList.get(i);
         dialog = new Dialog(this);
         dialog.setContentView(R.layout.checkquiz_dialogue);
@@ -239,7 +272,7 @@ public class MenuActivity extends Activity {
         quizName.setText("Quiz name : " + quiz.getQuizName());
         creatorName.setText("Creator name : " + quiz.getCreatorUsername());
 
-        Button startQuizBT = dialog.findViewById(R.id.startQuizBT);
+        Button startQuizBT = dialog.findViewById(R.id.startQuizBtn);
         Button closeDialogueBT = dialog.findViewById(R.id.closeDialogueBT);
 
         startQuizBT.setOnClickListener(v -> {
@@ -251,6 +284,44 @@ public class MenuActivity extends Activity {
         closeDialogueBT.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
+    @OnItemClick(R.id.listOfMyQuizzesLV)
+    public void onItemListClickMyQuizzes(int i) {
+        Quiz quiz = quizList.get(i);
+        checkMyQuizDialogue = new Dialog(this);
+        checkMyQuizDialogue.setContentView(R.layout.checkmyquiz_dialogue);
+
+        TextView quizName = checkMyQuizDialogue.findViewById(R.id.quizNameT);
+        TextView creatorName = checkMyQuizDialogue.findViewById(R.id.creatorNameT);
+
+        quizName.setText("Quiz name : " + quiz.getQuizName());
+        creatorName.setText("You");
+
+        Button deleteQuizBtn = checkMyQuizDialogue.findViewById(R.id.deleteQuizBtn);
+        Button closeDialogueBT = checkMyQuizDialogue.findViewById(R.id.closeDialogueBT);
+
+
+        deleteQuizBtn.setOnClickListener(v -> databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                dataSnapshot.child(quiz.getQuizName()).getRef().removeValue(new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                        System.out.println("Data deleted successfully");
+                        showMyQuizzesAfterDelete();
+                        checkMyQuizDialogue.dismiss();
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        }));
+        closeDialogueBT.setOnClickListener(v -> checkMyQuizDialogue.dismiss());
+        checkMyQuizDialogue.show();
+    }
 
     @OnClick(R.id.searchListBT)
     public void searchQuizzes() {
@@ -258,18 +329,38 @@ public class MenuActivity extends Activity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                quizList.clear();
-                for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    if (Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName().toLowerCase().contains(informationToSearch.toLowerCase()) ||
-                            Objects.requireNonNull(ds.getValue(Quiz.class)).getCreatorUsername().toLowerCase().contains(informationToSearch.toLowerCase())) {
-                        Quiz quiz = new Quiz();
-                        quiz.setCreatorUsername(Objects.requireNonNull(ds.getValue(Quiz.class)).getCreatorUsername());
-                        quiz.setQuizName(Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName());
-                        quizList.add(quiz);
+                if(listOfQuizzesLV.getVisibility() == View.VISIBLE) {
+                    quizList.clear();
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        if (Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName().toLowerCase().contains(informationToSearch.toLowerCase()) ||
+                                Objects.requireNonNull(ds.getValue(Quiz.class)).getCreatorUsername().toLowerCase().contains(informationToSearch.toLowerCase())) {
+                            Quiz quiz = new Quiz();
+                            quiz.setCreatorUsername(Objects.requireNonNull(ds.getValue(Quiz.class)).getCreatorUsername());
+                            quiz.setQuizName(Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName());
+                            quizList.add(quiz);
+                        }
                     }
+                    QuizArrayListAdapter adapter = new QuizArrayListAdapter(MenuActivity.this, quizList);
+                    listOfQuizzesLV.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                    listOfQuizzesLV.requestLayout();
+                }else if(listOfMyQuizzesLV.getVisibility() == View.VISIBLE){
+                    myQuizList.clear();
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        if (Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName().toLowerCase().contains(informationToSearch.toLowerCase()) &&
+                                Objects.requireNonNull(ds.getValue(Quiz.class)).getCreatorUsername().toLowerCase().contains(currentlyLoggedInUserName.toLowerCase())) {
+                            Quiz quiz = new Quiz();
+                            quiz.setCreatorUsername(Objects.requireNonNull(ds.getValue(Quiz.class)).getCreatorUsername());
+                            quiz.setQuizName(Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName());
+                            myQuizList.add(quiz);
+                        }
+                    }
+                    QuizArrayListAdapter adapter = new QuizArrayListAdapter(MenuActivity.this, myQuizList);
+                    listOfMyQuizzesLV.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                    listOfMyQuizzesLV.requestLayout();
+
                 }
-                QuizArrayListAdapter adapter = new QuizArrayListAdapter(MenuActivity.this, quizList);
-                listOfQuizzesLV.setAdapter(adapter);
             }
 
             @Override

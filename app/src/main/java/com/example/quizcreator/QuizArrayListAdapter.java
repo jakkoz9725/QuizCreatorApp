@@ -40,7 +40,6 @@ public class QuizArrayListAdapter extends ArrayAdapter<Quiz> {
         Quiz quiz = quizList.get(position);
         quizNameT.setText(quiz.getQuizName());
         creatorNameT.setText(quiz.getCreatorUsername());
-
         return listViewItem;
     }
 }
