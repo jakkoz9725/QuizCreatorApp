@@ -82,6 +82,15 @@ public class MenuActivity extends Activity {
         animation.setAnimationListener(new AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
+                if (v.equals(listOfQuizzesConstraintLayout)) {
+                    v.setVisibility(View.GONE);
+                    if (listOfMyQuizzesLV.getVisibility() == View.VISIBLE) {
+                        listOfMyQuizzesLV.startAnimation(transparent_anim_disapear);
+                    } else if (listOfQuizzesLV.getVisibility() == View.VISIBLE) {
+                        listOfQuizzesLV.startAnimation(transparent_anim_disapear);
+                    }
+
+                }
                 v.setVisibility(View.GONE);
             }
 
@@ -89,6 +98,10 @@ public class MenuActivity extends Activity {
             public void onAnimationEnd(Animation animation) {
                 v2.setVisibility(View.VISIBLE);
                 v2.startAnimation(transparent_anim_appear);
+                if (v.equals(listOfQuizzesConstraintLayout)) {
+                    listOfMyQuizzesLV.setVisibility(View.GONE);
+                    listOfQuizzesLV.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -113,7 +126,7 @@ public class MenuActivity extends Activity {
 
     @BindView(R.id.listOfQuizesLV)
     ListView listOfQuizzesLV;
-    
+
     @BindView(R.id.listOfMyQuizzesLV)
     ListView listOfMyQuizzesLV;
 
@@ -155,10 +168,9 @@ public class MenuActivity extends Activity {
 
     @OnClick(R.id.backToMenuBT)
     public void onClickBackToMenuBT() {
-        listOfQuizzesConstraintLayout.setVisibility(View.GONE);
-        listOfQuizzesLV.setVisibility(View.GONE);
-        listOfMyQuizzesLV.setVisibility(View.GONE);
-        menuConstraintLayout.setVisibility(View.VISIBLE);
+        startAnimation(transparent_anim_disapear, listOfQuizzesConstraintLayout, menuConstraintLayout);
+        //listOfQuizzesConstraintLayout.setVisibility(View.GONE);
+        //menuConstraintLayout.setVisibility(View.VISIBLE);
     }
 
     @OnClick(R.id.listOfQuizzesBT)
@@ -198,7 +210,7 @@ public class MenuActivity extends Activity {
                     Quiz quiz = new Quiz();
                     quiz.setCreatorUsername(Objects.requireNonNull(ds.getValue(Quiz.class)).getCreatorUsername());
                     quiz.setQuizName(Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName());
-                    if(quiz.getCreatorUsername().equals(currentlyLoggedInUserName)) {
+                    if (quiz.getCreatorUsername().equals(currentlyLoggedInUserName)) {
                         quizList.add(quiz);
                     }
                 }
