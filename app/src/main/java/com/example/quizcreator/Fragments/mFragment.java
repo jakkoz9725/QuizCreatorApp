@@ -330,6 +330,26 @@ public class mFragment extends Fragment {
         }
         checkIsCompleted();
     }
+    @OnClick(R.id.deleteTextBtn)
+    public void deleteTextBtnClick() {
+        switch (currentPosition) {
+            case 1:
+                answer1ET.setText("");
+                    break;
+            case 2:
+                answer2ET.setText("");
+                    break;
+            case 3:
+                answer3ET.setText("");
+                    break;
+            case 4:
+                answer4ET.setText("");
+                    break;
+            case 5:
+                questionET.setText("");
+                    break;
+                }
+    }
 
     @OnClick(R.id.editAnswer1Btn)
     public void editAnswer1() {
@@ -360,6 +380,14 @@ public class mFragment extends Fragment {
         answer4Accepted = false;
         turnOnAnswerEdit(answer4ET);
         constraintSet.setVisibility(R.id.editAnswer4Btn, View.GONE);
+        cleanHangingButtons();
+    }
+
+    @OnClick(R.id.editQuestionBtn)
+    public void editQuestion() {
+        questionAccepted = false;
+        turnOnAnswerEdit(questionET);
+        constraintSet.setVisibility(R.id.editQuestionBtn, View.GONE);
         cleanHangingButtons();
     }
 

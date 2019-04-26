@@ -160,7 +160,7 @@
     <LinearLayout
         android:id="@+id/topBarLayout"
         android:layout_width="0dp"
-        android:layout_height="35dp"
+        android:layout_height="50dp"
         android:orientation="horizontal"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
@@ -173,9 +173,10 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:fontFamily="@font/playfair_display"
             android:text="Quiz creator"
             android:textAlignment="center"
-            android:textSize="24sp" />
+            android:textSize="32sp" />
 
         <Button
             android:id="@+id/settingsBT"
@@ -199,15 +200,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/settingsLayout"
             android:layout_width="140dp"
             android:layout_height="250dp"
-            android:visibility="gone"
-            android:clickable="true"
             android:background="@color/transparent_white"
+            android:clickable="true"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 

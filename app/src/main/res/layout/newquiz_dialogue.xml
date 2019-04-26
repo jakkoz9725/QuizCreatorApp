@@ -15,11 +15,9 @@
         android:layout_width="250dp"
         android:layout_height="200dp"
         android:layout_gravity="center"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="50dp"
-        android:layout_marginEnd="8dp"
         android:layout_weight="1"
-        android:background="@color/colorWhite"
+        android:background="#303031"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -178,18 +176,25 @@
 
         <TextView
             android:id="@+id/quizNameRequirement"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="8dp"
-            android:text="Quizname between 5-10 characters"
-            android:textAlignment="center"
-            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="6dp"
+            android:drawableStart="@drawable/red_arrow_question_requirment_ic"
+            android:fontFamily="@font/playfair_display"
+            android:gravity="center_vertical"
+            android:text="Quiz name 5-10 letters"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/secondRow" />
+            app:layout_constraintTop_toBottomOf="@+id/secondRow"
+            app:layout_constraintVertical_bias="0.741" />
     </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.ConstraintLayout
@@ -197,11 +202,9 @@
         android:layout_width="250dp"
         android:layout_height="202dp"
         android:layout_gravity="center"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:layout_weight="1"
-        android:background="@color/colorWhite"
+        android:background="#303031"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -211,19 +214,22 @@
 
         <EditText
             android:id="@+id/loggedUserEmailT"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:hint="Type Quiz name"
-            android:textAlignment="center"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/custom_edit_text"
+            android:drawableStart="@drawable/quiz_name_edittext_ic"
+            android:fontFamily="@font/playfair_display"
+            android:gravity="center_vertical"
+            android:hint="quiz name"
+            android:paddingStart="6dp"
             android:textSize="20sp"
             android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.506"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/quizNameRequirement" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/createQuizBTdialogue"

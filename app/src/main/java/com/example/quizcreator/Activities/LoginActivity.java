@@ -145,7 +145,8 @@ public class LoginActivity extends Activity {
         scarryGhostAnim(ghost_emoji_anim, imageViewGhostEmoji);
         overridePendingTransition(R.anim.transparent_anim_appear, R.anim.transparent_anim_disapear);
         Patterns patterns = new Patterns(this);
-       // welcomeImage.setVisibility(View.VISIBLE);
+        // welcomeImage.setVisibility(View.VISIBLE);
+        appStartLayout.setVisibility(View.GONE);
 
 
         loginClass = new LoginClass.Builder()
@@ -194,7 +195,7 @@ public class LoginActivity extends Activity {
         transparent_anim_disapear.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                appStartLayout.setVisibility(View.GONE);
+                 appStartLayout.setVisibility(View.GONE);
             }
 
             @Override
@@ -239,17 +240,6 @@ public class LoginActivity extends Activity {
         }
     }
 
-
-//        if (id == showPasswordToggleBtn.getId()) {
-//            if (userPasswordET.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())) {
-//                userPasswordET.setTransformationMethod(PasswordTransformationMethod.getInstance());
-//            } else {
-//                userPasswordET.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-//            }
-//        }else if{
-//
-//        }
-//    }
 
     @OnClick(R.id.createAccCT)
     public void OnClickCreateNewAcc() {
@@ -311,8 +301,8 @@ public class LoginActivity extends Activity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            //welcomeImage.setVisibility(View.VISIBLE);
-            appStartLayout.setVisibility(View.VISIBLE);
+            welcomeImage.setVisibility(View.VISIBLE);
+            welcomeImage.startAnimation(transparent_anim_appear);
             loadingUserPB.setVisibility(View.VISIBLE);
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -320,21 +310,18 @@ public class LoginActivity extends Activity {
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
                         if (Objects.requireNonNull(ds.getValue(User.class)).getEmail().equals(currentUser.getEmail())) {
                             loggedInAs = Objects.requireNonNull(ds.getValue(User.class)).getUserName();
+                            loadingUserPB.setVisibility(View.GONE);
+                            appStartLayout.setVisibility(View.VISIBLE);
+                            appStartLayout.startAnimation(transparent_anim_appear);
+                            loginAsTV.setText("Log in as " + loggedInAs);
+                            continueAsBT.setText("CONTINUE");
+                            startMessageTV.setText("Do you want to continue?");
                         }
                     }
-                    loginAsTV.setVisibility(View.VISIBLE);
-                    startMessageTV.setVisibility(View.VISIBLE);
-                    continueAsBT.setVisibility(View.VISIBLE);
-                    logoutAtStartCT.setVisibility(View.VISIBLE);
-                    loadingUserPB.setVisibility(View.GONE);
-                    loginAsTV.setText("Log in as " + loggedInAs);
-                    continueAsBT.setText("CONTINUE");
-                    startMessageTV.setText("Do you want to continue?");
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
                 }
             });
         } else {

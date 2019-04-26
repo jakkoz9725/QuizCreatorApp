@@ -1,9 +1,9 @@
 package com.example.quizcreator.Activities;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.VoiceInteractor;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -408,8 +408,10 @@ public class MenuActivity extends Activity {
                 quizNameIsCorrect = patterns.isDataCorrect(quizNameETdialogue.getText().toString(), patterns.getUserNamePattern()); // same pattern as for username
                 if (quizNameIsCorrect) {
                     quizNameRequirement.setTextColor(getColor(R.color.green));
+                    quizNameRequirement.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_done_green,0,0,0);
                 } else {
                     quizNameRequirement.setTextColor(startColor);
+                    quizNameRequirement.setCompoundDrawablesWithIntrinsicBounds(R.drawable.red_arrow_question_requirment_ic,0,0,0);
                 }
             }
 
@@ -496,6 +498,33 @@ public class MenuActivity extends Activity {
 //        }
 //    }
 
+
+
+
+    @Override
+    public void onBackPressed() {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.backpress_dialogue);
+        Button acceptBtn = dialog.findViewById(R.id.dialogueConfirmBtn);
+        Button cancelBtn = dialog.findViewById(R.id.dialogueCancelBtn);
+        TextView dialogueTextView = dialog.findViewById(R.id.dialogueTextView);
+
+
+        dialogueTextView.setText("Do you want to quit?");
+        acceptBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            finish();
+            }
+        });
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
 
     @OnClick(R.id.settingsBT)
     public void onSettingsBtnClick() {

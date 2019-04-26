@@ -8,6 +8,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+import butterknife.BindAnim;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -46,6 +48,7 @@ public class QuizCreationActivity extends AppCompatActivity {
     public static int fragmentCounter = 0;
     boolean frag1, frag2, frag3, frag4, frag5;
 
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
@@ -55,7 +58,9 @@ public class QuizCreationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.quiz_creator_layout);
+        overridePendingTransition(R.anim.transparent_anim_appear, R.anim.transparent_anim_disapear);
         ButterKnife.bind(this);
+        mViewPager.startAnimation(transparent_anim_appear);
         Intent intent = getIntent();
         quizName = intent.getStringExtra("quizName");
         mViewPager.setOffscreenPageLimit(8);
@@ -81,6 +86,8 @@ public class QuizCreationActivity extends AppCompatActivity {
             }
         });
     }
+    @BindAnim(R.anim.transparent_anim_appear)
+    Animation transparent_anim_appear;
 
     @BindView(R.id.finishQuizBtn)
     Button finishQuizBtn;
