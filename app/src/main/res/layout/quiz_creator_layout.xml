@@ -4,19 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.QuizCreationActivity">
+    tools:context=".Activities.QuizCreationActivity"
+    tools:visibility="visible">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/mViewPager"
         android:layout_width="match_parent"
-        android:layout_height="397dp"
-        android:layout_marginTop="167dp"
-        android:layout_marginBottom="167dp"
+        android:layout_height="500dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="120dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"></android.support.v4.view.ViewPager>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible"></android.support.v4.view.ViewPager>
 
     <Button
         android:id="@+id/previousFragmentBtn"
@@ -25,8 +27,10 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
         android:text="PREVIOUS"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="gone" />
 
     <Button
         android:id="@+id/nextFragmentBtn"
@@ -37,7 +41,8 @@
         android:text="NEXT"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="gone" />
 
     <Button
         android:id="@+id/finishQuizBtn"

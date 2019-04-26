@@ -7,6 +7,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.text.InputType;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Button;
@@ -15,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.example.quizcreator.Classes.LoginClass;
 import com.example.quizcreator.Classes.Patterns;
@@ -29,6 +33,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
+
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -88,6 +95,12 @@ public class LoginActivity extends Activity {
     TextView passwordRequirement;
     @BindView(R.id.passwordRepRequirement)
     TextView passwordRepRequirement;
+    @BindView(R.id.showPasswordToggleBtn)
+    ToggleButton showPasswordToggleBtn;
+    @BindView(R.id.showPasswordCreateAccount)
+    ToggleButton showPasswordCreateAccount;
+    @BindView(R.id.showPasswordRepCreateAccount)
+    ToggleButton showPasswordRepCreateAccount;
     @BindView(R.id.emailRequirement)
     TextView emailRequirement;
     @BindView(R.id.registerPB)
@@ -132,6 +145,7 @@ public class LoginActivity extends Activity {
         scarryGhostAnim(ghost_emoji_anim, imageViewGhostEmoji);
         overridePendingTransition(R.anim.transparent_anim_appear, R.anim.transparent_anim_disapear);
         Patterns patterns = new Patterns(this);
+       // welcomeImage.setVisibility(View.VISIBLE);
 
 
         loginClass = new LoginClass.Builder()
@@ -142,11 +156,11 @@ public class LoginActivity extends Activity {
                 .build();
         registerClass = new RegisterClass.Builder()
                 .activityContext(this)
-                .textViewsRequirments(passwordRequirement,passwordRepRequirement,emailRequirement,usernameRequirement)
+                .textViewsRequirments(passwordRequirement, passwordRepRequirement, emailRequirement, usernameRequirement)
                 .firebaseAuth(mAuth)
                 .databaseReference(databaseReference)
                 .patterns(patterns)
-                .colors(getColor(R.color.colorWhite),getColor(R.color.green))
+                .colors(getColor(R.color.colorWhite), getColor(R.color.green))
                 .progressBar(registerPB)
                 .build();
 
@@ -197,8 +211,50 @@ public class LoginActivity extends Activity {
         appStartLayout.startAnimation(transparent_anim_disapear);
     }
 
+    @OnClick({R.id.showPasswordToggleBtn, R.id.showPasswordCreateAccount, R.id.showPasswordRepCreateAccount})
+    public void showPassword(View v) {
+        int id = v.getId();
+        switch (id) {
+            case R.id.showPasswordToggleBtn:
+                if (userPasswordET.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())) {
+                    userPasswordET.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                } else {
+                    userPasswordET.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                }
+                break;
+            case R.id.showPasswordCreateAccount:
+                if (newUserPasswordET.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())) {
+                    newUserPasswordET.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                } else {
+                    newUserPasswordET.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                }
+                break;
+            case R.id.showPasswordRepCreateAccount:
+                if (newUserPasswordRepET.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())) {
+                    newUserPasswordRepET.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                } else {
+                    newUserPasswordRepET.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                }
+                break;
+        }
+    }
+
+
+//        if (id == showPasswordToggleBtn.getId()) {
+//            if (userPasswordET.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())) {
+//                userPasswordET.setTransformationMethod(PasswordTransformationMethod.getInstance());
+//            } else {
+//                userPasswordET.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+//            }
+//        }else if{
+//
+//        }
+//    }
+
     @OnClick(R.id.createAccCT)
     public void OnClickCreateNewAcc() {
+        welcomeImage.setVisibility(View.GONE);
+        //welcomeImage.startAnimation(transparent_anim_disapear);
         startAnimation(transparent_anim_appear, registerLayout, transparent_anim_disapear, loginLayout);
     }
 
@@ -224,20 +280,21 @@ public class LoginActivity extends Activity {
 
     @OnTextChanged(R.id.newUserPasswordRepET)
     public void onTextPasswordRepETChange() {
-        registerClass.passwordRepIsCorrect(newUserPasswordRepET.getText().toString(),newUserPasswordET.getText().toString());
+        registerClass.passwordRepIsCorrect(newUserPasswordRepET.getText().toString(), newUserPasswordET.getText().toString());
     }
 
     @OnClick(R.id.createAccBT)
-    public void tryToCreate(){
+    public void tryToCreate() {
         Map<String, String> map = new HashMap<>();
-        map.put("userEmail",newUserEmailET.getText().toString());
-        map.put("userName",newUsernameET.getText().toString());
-        map.put("userPassword",newUserPasswordET.getText().toString());
+        map.put("userEmail", newUserEmailET.getText().toString());
+        map.put("userName", newUsernameET.getText().toString());
+        map.put("userPassword", newUserPasswordET.getText().toString());
         registerClass.checkIsUsernameAlreadyTaken(map);
     }
+
     @OnClick(R.id.signInBtn)
     public void LoginWithEmailAndPassword() {
-        loginClass.loginWithEmailAndPassword(userEmailET.getText().toString(),userPasswordET.getText().toString());
+        loginClass.loginWithEmailAndPassword(userEmailET.getText().toString(), userPasswordET.getText().toString());
     }
 
     @OnClick(R.id.continueAsBT)
@@ -254,7 +311,7 @@ public class LoginActivity extends Activity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            welcomeImage.setVisibility(View.VISIBLE);
+            //welcomeImage.setVisibility(View.VISIBLE);
             appStartLayout.setVisibility(View.VISIBLE);
             loadingUserPB.setVisibility(View.VISIBLE);
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -285,6 +342,7 @@ public class LoginActivity extends Activity {
             loginLayout.startAnimation(transparent_anim_appear);
         }
     }
+
     public void startAnimation(Animation animationApear, View viewApear, Animation animationDisapear, View viewDisapear) {
         animationDisapear.setAnimationListener(new Animation.AnimationListener() {
             @Override

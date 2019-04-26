@@ -2,6 +2,7 @@ package com.example.quizcreator.Activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import com.example.quizcreator.Fragments.FragmentManagement;
 import com.example.quizcreator.Classes.Quiz;
 import com.example.quizcreator.R;
 import com.example.quizcreator.Fragments.mFragment;
+import com.google.android.gms.common.util.PlatformVersion;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -61,8 +63,8 @@ public class QuizCreationActivity extends AppCompatActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         myRefAccounts = mFirebaseDatabase.getReference("Accounts");
         myRef = mFirebaseDatabase.getReference("Quizzes");
-
-        myRefAccounts.addListenerForSingleValueEvent(new ValueEventListener() {
+        getFirstQuestion();
+            myRefAccounts.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
@@ -184,7 +186,17 @@ public class QuizCreationActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-
+    public void getFirstQuestion(){
+        mViewPager.setVisibility(View.VISIBLE);
+        mFragmentsArrayList.add(new mFragment());
+        while (fragmentNr != mFragmentsArrayList.size()) {
+            adapter.addFragment((mFragmentsArrayList.get(fragmentNr)));
+            fragmentNr++;
+        }
+        mViewPager.setAdapter(adapter);
+        mViewPager.setCurrentItem(fragmentNr);
+        fragmentCounter++;
+    }
 
     @OnClick(R.id.nextFragmentBtn)
     public void nextFragment() {

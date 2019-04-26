@@ -79,6 +79,7 @@ public class MenuActivity extends Activity {
         databaseReference = mFirebaseDatabase.getReference("Quizzes");
         myRefAccounts = mFirebaseDatabase.getReference("Accounts");
         mAuth = FirebaseAuth.getInstance();
+        overridePendingTransition(R.anim.transparent_anim_appear, R.anim.transparent_anim_disapear);
         getCurrentUsername();
     }
 
@@ -232,33 +233,35 @@ public class MenuActivity extends Activity {
             }
         });
     }
-    public void showMyQuizzesAfterDelete(){
-            //listOfMyQuizzesLV.setVisibility(View.VISIBLE);
-            //startAnimation(transparent_anim_disapear, menuConstraintLayout, listOfQuizzesConstraintLayout);
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    myQuizList.clear();
-                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        Quiz quiz = new Quiz();
-                        quiz.setCreatorUsername(Objects.requireNonNull(ds.getValue(Quiz.class)).getCreatorUsername());
-                        quiz.setQuizName(Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName());
-                        if (quiz.getCreatorUsername().equals(currentlyLoggedInUserName)) {
-                            myQuizList.add(quiz);
-                        }
+
+    public void showMyQuizzesAfterDelete() {
+        //listOfMyQuizzesLV.setVisibility(View.VISIBLE);
+        //startAnimation(transparent_anim_disapear, menuConstraintLayout, listOfQuizzesConstraintLayout);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                myQuizList.clear();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Quiz quiz = new Quiz();
+                    quiz.setCreatorUsername(Objects.requireNonNull(ds.getValue(Quiz.class)).getCreatorUsername());
+                    quiz.setQuizName(Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName());
+                    if (quiz.getCreatorUsername().equals(currentlyLoggedInUserName)) {
+                        myQuizList.add(quiz);
                     }
-                    QuizArrayListAdapter adapter = new QuizArrayListAdapter(MenuActivity.this, myQuizList);
-                    listOfMyQuizzesLV.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-                    listOfMyQuizzesLV.requestLayout();
                 }
+                QuizArrayListAdapter adapter = new QuizArrayListAdapter(MenuActivity.this, myQuizList);
+                listOfMyQuizzesLV.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+                listOfMyQuizzesLV.requestLayout();
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                }
-            });
+            }
+        });
     }
+
     @SuppressLint("SetTextI18n")
 
     @OnItemClick(R.id.listOfQuizesLV)
@@ -284,9 +287,10 @@ public class MenuActivity extends Activity {
         closeDialogueBT.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
+
     @OnItemClick(R.id.listOfMyQuizzesLV)
     public void onItemListClickMyQuizzes(int i) {
-        Quiz quiz = quizList.get(i);
+        Quiz quiz = myQuizList.get(i);
         checkMyQuizDialogue = new Dialog(this);
         checkMyQuizDialogue.setContentView(R.layout.checkmyquiz_dialogue);
 
@@ -329,7 +333,7 @@ public class MenuActivity extends Activity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(listOfQuizzesLV.getVisibility() == View.VISIBLE) {
+                if (listOfQuizzesLV.getVisibility() == View.VISIBLE) {
                     quizList.clear();
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
                         if (Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName().toLowerCase().contains(informationToSearch.toLowerCase()) ||
@@ -344,7 +348,7 @@ public class MenuActivity extends Activity {
                     listOfQuizzesLV.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
                     listOfQuizzesLV.requestLayout();
-                }else if(listOfMyQuizzesLV.getVisibility() == View.VISIBLE){
+                } else if (listOfMyQuizzesLV.getVisibility() == View.VISIBLE) {
                     myQuizList.clear();
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
                         if (Objects.requireNonNull(ds.getValue(Quiz.class)).getQuizName().toLowerCase().contains(informationToSearch.toLowerCase()) &&
@@ -440,11 +444,16 @@ public class MenuActivity extends Activity {
                     Toast.makeText(MenuActivity.this, "Quiz named " + quizName + " already exist", Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
                 } else {
-                    dialog.dismiss();
-                    progressBar.setVisibility(View.GONE);
+                    //dialog.dismiss();
+                    //progressBar.setVisibility(View.GONE);
+                    createNewQuizBT.setVisibility(View.GONE);
+                    listOfMyQuizesBtn.setVisibility(View.GONE);
+                    listOfQuizzes.setVisibility(View.GONE);
                     Intent intent = new Intent(getApplicationContext(), QuizCreationActivity.class);
                     intent.putExtra("quizName", quizName);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.transparent_anim_appear, R.anim.transparent_anim_disapear);
+
                 }
             }
 

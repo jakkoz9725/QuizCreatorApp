@@ -149,6 +149,15 @@
     </android.support.constraint.ConstraintLayout>
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        />
+
+
+    <LinearLayout
         android:id="@+id/topBarLayout"
         android:layout_width="0dp"
         android:layout_height="35dp"
