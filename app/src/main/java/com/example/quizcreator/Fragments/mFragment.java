@@ -1,5 +1,8 @@
 package com.example.quizcreator.Fragments;
 
+import android.app.Activity;
+import android.hardware.input.InputManager;
+import android.inputmethodservice.InputMethodService;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,6 +12,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -18,6 +25,7 @@ import android.widget.Toast;
 import com.example.quizcreator.Activities.QuizCreationActivity;
 import com.example.quizcreator.R;
 
+import butterknife.BindAnim;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -45,6 +53,7 @@ public class mFragment extends Fragment {
         ButterKnife.bind(this, view);
         fragmentNumberT.setText(fragmentActualNumber);
         constraintSet.clone(constraintLayout);
+        constraintLayout.setFocusable(false);
         checkIsCompleted();
         return view;
     }
@@ -90,6 +99,26 @@ public class mFragment extends Fragment {
     Button pickCorrectAnswerBtn;
     @BindView(R.id.fragmentNumberT)
     TextView fragmentNumberT;
+    @BindView(R.id.editQuestionBtn)
+    Button editQuestionBtn;
+
+    @BindAnim(R.anim.transparent_anim_appear)
+    Animation transparent_anim_appear;
+
+    @BindAnim(R.anim.transparent_anim_disapear_buttons)
+    Animation transparent_anim_disapear;
+    @OnClick(R.id.constraintLayout)
+    public void hideEverything(){
+        getActivity().getCurrentFocus().clearFocus();
+        if(deleteTextBtn.getVisibility() == View.VISIBLE) {
+            constraintSet.setVisibility(R.id.deleteTextBtn, View.GONE);
+            constraintSet.setVisibility(R.id.answerAcceptBtn, View.GONE);
+            deleteTextBtn.startAnimation(transparent_anim_disapear);
+            answerAcceptBtn.startAnimation(transparent_anim_disapear);
+            constraintSet.applyTo(constraintLayout);
+        }
+        hideKeyboard();
+    }
 
     @OnClick(R.id.pickCorrectAnswerBtn)
     public void pickCorrectAnswer() {
@@ -246,7 +275,7 @@ public class mFragment extends Fragment {
 
             answerBtnStage = 1;
             deleteButtonPlacement = 1;
-        } else{
+        } else {
             constraintSet.setVisibility(R.id.answer4ET, View.VISIBLE);
             constraintSet.setVisibility(R.id.addAnswerBtn, View.INVISIBLE);
             constraintSet.connect(R.id.deleteAnswerBtn, ConstraintSet.END, R.id.answer4ET, ConstraintSet.START, 0);
@@ -263,9 +292,10 @@ public class mFragment extends Fragment {
 
     @OnClick(R.id.answerAcceptBtn)
     public void acceptButton() {
+        String odp = "";
         switch (currentPosition) {
             case 1:
-                String odp = answer1ET.getText().toString();
+                 odp = answer1ET.getText().toString();
                 if (odp.length() == 0) {
                     Toast.makeText(getActivity(), "Pusta odpowiedz!", Toast.LENGTH_SHORT).show();
                     break;
@@ -325,30 +355,37 @@ public class mFragment extends Fragment {
                     constraintSet.setVisibility(R.id.answer1ET, View.VISIBLE);
                     constraintSet.setVisibility(R.id.answer2ET, View.VISIBLE);
                     constraintSet.applyTo(constraintLayout);
+                    editQuestionBtn.startAnimation(transparent_anim_appear);
                     break;
                 }
         }
+        if(odp.length() != 0) {
+            answerAcceptBtn.startAnimation(transparent_anim_disapear);
+            deleteTextBtn.startAnimation(transparent_anim_disapear);
+        }
+        hideKeyboard();
         checkIsCompleted();
     }
+
     @OnClick(R.id.deleteTextBtn)
     public void deleteTextBtnClick() {
         switch (currentPosition) {
             case 1:
                 answer1ET.setText("");
-                    break;
+                break;
             case 2:
                 answer2ET.setText("");
-                    break;
+                break;
             case 3:
                 answer3ET.setText("");
-                    break;
+                break;
             case 4:
                 answer4ET.setText("");
-                    break;
+                break;
             case 5:
                 questionET.setText("");
-                    break;
-                }
+                break;
+        }
     }
 
     @OnClick(R.id.editAnswer1Btn)
@@ -465,13 +502,15 @@ public class mFragment extends Fragment {
         constraintSet.connect(R.id.answerAcceptBtn, ConstraintSet.TOP, viewRid, ConstraintSet.BOTTOM, 0);
         constraintSet.connect(R.id.answerAcceptBtn, ConstraintSet.START, viewRid, ConstraintSet.START, 0);
         constraintSet.applyTo(constraintLayout);
+        deleteTextBtn.startAnimation(transparent_anim_appear);
+        answerAcceptBtn.startAnimation(transparent_anim_appear);
     }
 
     public void onFocusChange(View v) {
         int i = v.getId();
         if (i == R.id.answer1ET) {
             currentPosition = 1;
-            constrainSetUpgrade(i);
+             constrainSetUpgrade(i);
         } else if (i == R.id.answer2ET) {
             currentPosition = 2;
             constrainSetUpgrade(i);
@@ -485,6 +524,10 @@ public class mFragment extends Fragment {
             currentPosition = 5;
             constrainSetUpgrade(i);
         }
+       // constrainSetUpgrade(i); bug with word-auto-correct
+    }
+    public void hideKeyboard(){
+        QuizCreationActivity.hideSoftKeyboard(getActivity());
     }
 
     public void turnOnAnswerEdit(EditText et) {

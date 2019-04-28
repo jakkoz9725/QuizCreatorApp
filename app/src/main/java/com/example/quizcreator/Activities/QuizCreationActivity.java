@@ -1,5 +1,6 @@
 package com.example.quizcreator.Activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -9,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -45,6 +47,7 @@ public class QuizCreationActivity extends AppCompatActivity {
     private DatabaseReference myRef;
     private String username;
     private Quiz quiz;
+
     public static int fragmentCounter = 0;
     boolean frag1, frag2, frag3, frag4, frag5;
 
@@ -85,6 +88,13 @@ public class QuizCreationActivity extends AppCompatActivity {
 
             }
         });
+    }
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(
+                activity.getCurrentFocus().getWindowToken(), 0);
     }
     @BindAnim(R.anim.transparent_anim_appear)
     Animation transparent_anim_appear;
