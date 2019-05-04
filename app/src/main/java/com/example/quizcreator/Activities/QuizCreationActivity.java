@@ -1,6 +1,7 @@
 package com.example.quizcreator.Activities;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.quizcreator.Classes.User;
@@ -28,6 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import butterknife.BindAnim;
 import butterknife.BindView;
@@ -58,6 +61,34 @@ public class QuizCreationActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.backpress_dialogue);
+        Button acceptBtn = dialog.findViewById(R.id.dialogueConfirmBtn);
+        Button cancelBtn = dialog.findViewById(R.id.dialogueCancelBtn);
+        TextView dialogueTextView = dialog.findViewById(R.id.dialogueTextView);
+
+
+        dialogueTextView.setText("Do you want to go back to Main menu? \n You will loose everything u wrote here");
+        acceptBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                overridePendingTransition(R.anim.transparent_anim_appear, R.anim.transparent_anim_disapear);
+            }
+        });
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.quiz_creator_layout);
@@ -72,7 +103,7 @@ public class QuizCreationActivity extends AppCompatActivity {
         myRefAccounts = mFirebaseDatabase.getReference("Accounts");
         myRef = mFirebaseDatabase.getReference("Quizzes");
         getFirstQuestion();
-            myRefAccounts.addListenerForSingleValueEvent(new ValueEventListener() {
+        myRefAccounts.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
@@ -89,6 +120,7 @@ public class QuizCreationActivity extends AppCompatActivity {
             }
         });
     }
+
     public static void hideSoftKeyboard(Activity activity) {
         InputMethodManager inputMethodManager =
                 (InputMethodManager) activity.getSystemService(
@@ -96,6 +128,7 @@ public class QuizCreationActivity extends AppCompatActivity {
         inputMethodManager.hideSoftInputFromWindow(
                 activity.getCurrentFocus().getWindowToken(), 0);
     }
+
     @BindAnim(R.anim.transparent_anim_appear)
     Animation transparent_anim_appear;
 
@@ -203,7 +236,8 @@ public class QuizCreationActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-    public void getFirstQuestion(){
+
+    public void getFirstQuestion() {
         mViewPager.setVisibility(View.VISIBLE);
         mFragmentsArrayList.add(new mFragment());
         while (fragmentNr != mFragmentsArrayList.size()) {

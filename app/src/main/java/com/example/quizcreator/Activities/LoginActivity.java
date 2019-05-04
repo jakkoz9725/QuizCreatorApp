@@ -301,8 +301,8 @@ public class LoginActivity extends Activity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            welcomeImage.setVisibility(View.VISIBLE);
-            welcomeImage.startAnimation(transparent_anim_appear);
+          // welcomeImage.setVisibility(View.VISIBLE);
+          //  welcomeImage.startAnimation(transparent_anim_appear);
             loadingUserPB.setVisibility(View.VISIBLE);
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override

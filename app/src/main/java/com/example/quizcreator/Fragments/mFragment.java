@@ -1,8 +1,5 @@
 package com.example.quizcreator.Fragments;
 
-import android.app.Activity;
-import android.hardware.input.InputManager;
-import android.inputmethodservice.InputMethodService;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,10 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -51,6 +45,8 @@ public class mFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_layout, container, false);
         ButterKnife.bind(this, view);
+        //getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        //getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         fragmentNumberT.setText(fragmentActualNumber);
         constraintSet.clone(constraintLayout);
         constraintLayout.setFocusable(false);
@@ -58,7 +54,12 @@ public class mFragment extends Fragment {
         return view;
     }
 
-    @BindView(R.id.constraintLayout)
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @BindView(R.id.answerConstraintLayout)
     ConstraintLayout constraintLayout;
 
     @BindView(R.id.questionET)
@@ -107,9 +108,13 @@ public class mFragment extends Fragment {
 
     @BindAnim(R.anim.transparent_anim_disapear_buttons)
     Animation transparent_anim_disapear;
-    @OnClick(R.id.constraintLayout)
+    @OnClick(R.id.answerConstraintLayout)
     public void hideEverything(){
-        getActivity().getCurrentFocus().clearFocus();
+        try {
+            getActivity().getCurrentFocus().clearFocus();
+        }catch (NullPointerException e){
+            //ignore
+        }
         if(deleteTextBtn.getVisibility() == View.VISIBLE) {
             constraintSet.setVisibility(R.id.deleteTextBtn, View.GONE);
             constraintSet.setVisibility(R.id.answerAcceptBtn, View.GONE);
@@ -144,15 +149,15 @@ public class mFragment extends Fragment {
             constraintSet.setVisibility(R.id.editAnswer2Btn, View.INVISIBLE);
             constraintSet.setVisibility(R.id.editAnswer3Btn, View.INVISIBLE);
             constraintSet.setVisibility(R.id.editAnswer4Btn, View.INVISIBLE);
-            constraintSet.setVisibility(R.id.deleteAnswerBtn, View.INVISIBLE);
-
+            constraintSet.setVisibility(R.id.addAnswerBtn,View.INVISIBLE);
+            constraintSet.setVisibility(R.id.deleteAnswerBtn,View.INVISIBLE);
+            pickCorrectAnswerBtn.setText("Choose correct answer");
 
             constraintSet.applyTo(constraintLayout);
             answerBtnStage = 2;
             return;
         }
         if (answerBtnStage == 2) {
-            pickCorrectAnswerBtn.setText("Pick");
             if (radioButton1.isChecked()) {
                 Toast.makeText(getActivity(), "Answer 1 ", Toast.LENGTH_SHORT).show();
                 isCompleted(true);
@@ -169,10 +174,11 @@ public class mFragment extends Fragment {
                 Toast.makeText(getActivity(), "Musisz wybrać odpowiedź", Toast.LENGTH_SHORT).show();
                 return;
             }
+            deleteAnswerBtn.setVisibility(View.INVISIBLE);
             correctAnswerVisibilty();
             constraintSet.applyTo(constraintLayout);
             answerBtnStage = 3;
-            pickCorrectAnswerBtn.setText("Edytuj");
+            pickCorrectAnswerBtn.setText("Edit question");
             return;
         }
         if (answerBtnStage == 3) {
@@ -182,13 +188,11 @@ public class mFragment extends Fragment {
                 constraintSet.setVisibility(R.id.editAnswer2Btn, View.VISIBLE);
                 constraintSet.setVisibility(R.id.editAnswer3Btn, View.VISIBLE);
                 constraintSet.setVisibility(R.id.editAnswer4Btn, View.VISIBLE);
-                constraintSet.setVisibility(R.id.deleteAnswerBtn, View.VISIBLE);
             } else if (answer3_isActive) {
                 constraintSet.setVisibility(R.id.editQuestionBtn, View.VISIBLE);
                 constraintSet.setVisibility(R.id.editAnswer1Btn, View.VISIBLE);
                 constraintSet.setVisibility(R.id.editAnswer2Btn, View.VISIBLE);
                 constraintSet.setVisibility(R.id.editAnswer3Btn, View.VISIBLE);
-                constraintSet.setVisibility(R.id.deleteAnswerBtn, View.VISIBLE);
                 constraintSet.setVisibility(R.id.addAnswerBtn, View.VISIBLE);
             } else {
                 constraintSet.setVisibility(R.id.editQuestionBtn, View.VISIBLE);
@@ -196,9 +200,11 @@ public class mFragment extends Fragment {
                 constraintSet.setVisibility(R.id.editAnswer2Btn, View.VISIBLE);
                 constraintSet.setVisibility(R.id.addAnswerBtn, View.VISIBLE);
             }
-
+            if(answer3ET.getVisibility() == View.VISIBLE) {
+                constraintSet.setVisibility(R.id.deleteAnswerBtn, View.VISIBLE);
+            }
+            pickCorrectAnswerBtn.setText("Pick correct answer");
             answerBtnStage = 1;
-            pickCorrectAnswerBtn.setText("Choose");
             radioButton1.setChecked(false);
             radioButton2.setChecked(false);
             radioButton3.setChecked(false);
@@ -269,7 +275,6 @@ public class mFragment extends Fragment {
             constraintSet.connect(R.id.deleteAnswerBtn, ConstraintSet.END, R.id.answer3ET, ConstraintSet.START, 0);
             constraintSet.connect(R.id.deleteAnswerBtn, ConstraintSet.BOTTOM, R.id.answer3ET, ConstraintSet.BOTTOM, 0);
             answer3_isActive = true;
-            constraintSet.setVisibility(R.id.deleteAnswerBtn, View.VISIBLE);
             constraintSet.applyTo(constraintLayout);
             answerAdded = true;
 
@@ -281,7 +286,6 @@ public class mFragment extends Fragment {
             constraintSet.connect(R.id.deleteAnswerBtn, ConstraintSet.END, R.id.answer4ET, ConstraintSet.START, 0);
             constraintSet.connect(R.id.deleteAnswerBtn, ConstraintSet.BOTTOM, R.id.answer4ET, ConstraintSet.BOTTOM, 0);
             answer4_isActive = true;
-            constraintSet.setVisibility(R.id.deleteAnswerBtn, View.VISIBLE);
             constraintSet.applyTo(constraintLayout);
 
             answerBtnStage = 1;
@@ -314,6 +318,7 @@ public class mFragment extends Fragment {
                     break;
                 } else {
                     turnOffAnswerEdit(answer2ET);
+
                     constraintSet.setVisibility(R.id.editAnswer2Btn, View.VISIBLE);
                     constraintSet.applyTo(constraintLayout);
                     answer2Accepted = true;
@@ -497,10 +502,18 @@ public class mFragment extends Fragment {
     public void constrainSetUpgrade(int viewRid) {
         constraintSet.setVisibility(R.id.deleteTextBtn, View.VISIBLE);
         constraintSet.setVisibility(R.id.answerAcceptBtn, View.VISIBLE);
-        constraintSet.connect(R.id.deleteTextBtn, ConstraintSet.TOP, viewRid, ConstraintSet.BOTTOM, 0);
-        constraintSet.connect(R.id.deleteTextBtn, ConstraintSet.END, viewRid, ConstraintSet.END, 0);
-        constraintSet.connect(R.id.answerAcceptBtn, ConstraintSet.TOP, viewRid, ConstraintSet.BOTTOM, 0);
-        constraintSet.connect(R.id.answerAcceptBtn, ConstraintSet.START, viewRid, ConstraintSet.START, 0);
+        constraintSet.connect(R.id.deleteTextBtn,ConstraintSet.TOP, viewRid, ConstraintSet.TOP,0);
+        constraintSet.connect(R.id.deleteTextBtn,ConstraintSet.START, viewRid, ConstraintSet.END,0);
+        constraintSet.connect(R.id.answerAcceptBtn,ConstraintSet.TOP, viewRid, ConstraintSet.TOP,0);
+        constraintSet.connect(R.id.answerAcceptBtn,ConstraintSet.END, viewRid, ConstraintSet.START,0);
+        if(viewRid == questionET.getId()){
+            answerAcceptBtn.setHeight(questionET.getHeight());
+            deleteTextBtn.setHeight(questionET.getHeight());
+        }else{
+            answerAcceptBtn.setHeight(answer1ET.getHeight());
+            deleteTextBtn.setHeight(answer1ET.getHeight());
+        }
+
         constraintSet.applyTo(constraintLayout);
         deleteTextBtn.startAnimation(transparent_anim_appear);
         answerAcceptBtn.startAnimation(transparent_anim_appear);
@@ -527,7 +540,11 @@ public class mFragment extends Fragment {
        // constrainSetUpgrade(i); bug with word-auto-correct
     }
     public void hideKeyboard(){
-        QuizCreationActivity.hideSoftKeyboard(getActivity());
+        try {
+            QuizCreationActivity.hideSoftKeyboard(getActivity());
+        }catch (NullPointerException e){
+            //ignore
+        }
     }
 
     public void turnOnAnswerEdit(EditText et) {

@@ -44,7 +44,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnItemClick;
-import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MenuActivity extends Activity {
 
@@ -60,10 +59,6 @@ public class MenuActivity extends Activity {
     private DatabaseReference myRefAccounts;
     private FirebaseAuth mAuth;
 
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,12 +167,6 @@ public class MenuActivity extends Activity {
 
     }
 
-    @OnClick(R.id.backToMenuBT)
-    public void onClickBackToMenuBT() {
-        startAnimation(transparent_anim_disapear, listOfQuizzesConstraintLayout, menuConstraintLayout);
-        searchListET.setText("");
-    }
-
     @OnClick(R.id.listOfQuizzesBT)
     public void showAllQuizes() {
         listOfQuizzesLV.setVisibility(View.VISIBLE);
@@ -273,7 +262,7 @@ public class MenuActivity extends Activity {
         TextView creatorName = dialog.findViewById(R.id.creatorNameT);
 
         quizName.setText("Quiz name : " + quiz.getQuizName());
-        creatorName.setText("Creator name : " + quiz.getCreatorUsername());
+        creatorName.setText("Creator : " + quiz.getCreatorUsername());
 
         Button startQuizBT = dialog.findViewById(R.id.startQuizBtn);
         Button closeDialogueBT = dialog.findViewById(R.id.closeDialogueBT);
@@ -283,6 +272,7 @@ public class MenuActivity extends Activity {
             intent.putExtra("quizName", quiz.getQuizName());
             intent.putExtra("creatorName", quiz.getCreatorUsername());
             startActivity(intent);
+            overridePendingTransition(R.anim.transparent_anim_appear, R.anim.transparent_anim_disapear);
         });
         closeDialogueBT.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
@@ -503,27 +493,32 @@ public class MenuActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.backpress_dialogue);
-        Button acceptBtn = dialog.findViewById(R.id.dialogueConfirmBtn);
-        Button cancelBtn = dialog.findViewById(R.id.dialogueCancelBtn);
-        TextView dialogueTextView = dialog.findViewById(R.id.dialogueTextView);
+        if (listOfQuizzesConstraintLayout.getVisibility() == View.VISIBLE) {
+            startAnimation(transparent_anim_disapear, listOfQuizzesConstraintLayout, menuConstraintLayout);
+            searchListET.setText("");
+        } else {
+            Dialog dialog = new Dialog(this);
+            dialog.setContentView(R.layout.backpress_dialogue);
+            Button acceptBtn = dialog.findViewById(R.id.dialogueConfirmBtn);
+            Button cancelBtn = dialog.findViewById(R.id.dialogueCancelBtn);
+            TextView dialogueTextView = dialog.findViewById(R.id.dialogueTextView);
 
 
-        dialogueTextView.setText("Do you want to quit?");
-        acceptBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            finish();
-            }
-        });
-        cancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-        dialog.show();
+            dialogueTextView.setText("Do you want to quit?");
+            acceptBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+            cancelBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                }
+            });
+            dialog.show();
+        }
     }
 
     @OnClick(R.id.settingsBT)
